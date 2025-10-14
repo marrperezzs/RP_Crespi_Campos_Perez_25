@@ -19,6 +19,7 @@ import math
 from enum import Enum
 from typing import List, Optional
 import os
+from array import array
 
 # Constants
 SCREEN_WIDTH = 960
@@ -37,6 +38,26 @@ DARK_GRAY = (64, 64, 64)
 LIGHT_BLUE = (135, 206, 235)
 DARK_BLUE = (25, 25, 112)
 PLATFORM_COLOR = (139, 69, 19)  # Brown for platforms
+YELLOW = (255, 255, 0)
+
+# Background milestone colors
+SUNSET_SKY = (255, 165, 0)  # Orange
+SUNSET_GROUND = (255, 69, 0)  # Red-orange
+NIGHT_SKY = (25, 25, 112)  # Midnight blue
+NIGHT_GROUND = (0, 0, 0)  # Black
+RAINBOW_SKY = (255, 20, 147)  # Deep pink
+RAINBOW_GROUND = (0, 191, 255)  # Deep sky blue
+
+# Retro arcade colors
+NEON_GREEN = (0, 255, 0)
+NEON_PINK = (255, 20, 147)
+NEON_BLUE = (0, 191, 255)
+NEON_YELLOW = (255, 255, 0)
+NEON_ORANGE = (255, 165, 0)
+NEON_CYAN = (0, 255, 255)
+ARCADE_PURPLE = (128, 0, 128)
+ARCADE_RED = (255, 0, 0)
+ARCADE_CYAN = (0, 255, 255)
 
 # Game parameters
 GRAVITY = 800  # pixels/second²
@@ -162,6 +183,26 @@ class Player:
         highlight = pygame.Rect(self.rect.x + 2, self.rect.y + 2, 
                                self.rect.width - 4, self.rect.height - 4)
         pygame.draw.rect(surface, (200, 100, 255), highlight)
+        
+        # Draw smiley face
+        center_x = self.rect.centerx
+        center_y = self.rect.centery
+        
+        # Eyes
+        eye_size = 3
+        left_eye_x = center_x - 8
+        right_eye_x = center_x + 8
+        eye_y = center_y - 5
+        pygame.draw.circle(surface, WHITE, (left_eye_x, eye_y), eye_size)
+        pygame.draw.circle(surface, WHITE, (right_eye_x, eye_y), eye_size)
+        
+        # Eye pupils
+        pygame.draw.circle(surface, BLACK, (left_eye_x, eye_y), 1)
+        pygame.draw.circle(surface, BLACK, (right_eye_x, eye_y), 1)
+        
+        # Smile (arc)
+        smile_rect = pygame.Rect(center_x - 10, center_y - 2, 20, 12)
+        pygame.draw.arc(surface, WHITE, smile_rect, 0, 3.14, 2)
 
 class Obstacle:
     """Obstacle class for enemies and barriers"""
@@ -221,6 +262,8 @@ class Background:
         self.stars = []
         self.cloud_speed = 50  # Slower than main scroll speed
         self.star_speed = 30
+        self.current_sky_color = LIGHT_BLUE  # Default sky color
+        self.current_ground_color = DARK_BLUE  # Default ground color
         
         # Generate initial clouds
         for _ in range(5):
@@ -261,9 +304,9 @@ class Background:
         # Sky gradient
         for y in range(SCREEN_HEIGHT - 50):
             color_ratio = y / (SCREEN_HEIGHT - 50)
-            r = int(LIGHT_BLUE[0] * (1 - color_ratio) + DARK_BLUE[0] * color_ratio)
-            g = int(LIGHT_BLUE[1] * (1 - color_ratio) + DARK_BLUE[1] * color_ratio)
-            b = int(LIGHT_BLUE[2] * (1 - color_ratio) + DARK_BLUE[2] * color_ratio)
+            r = int(self.current_sky_color[0] * (1 - color_ratio) + self.current_ground_color[0] * color_ratio)
+            g = int(self.current_sky_color[1] * (1 - color_ratio) + self.current_ground_color[1] * color_ratio)
+            b = int(self.current_sky_color[2] * (1 - color_ratio) + self.current_ground_color[2] * color_ratio)
             pygame.draw.line(surface, (r, g, b), (0, y), (SCREEN_WIDTH, y))
         
         # Draw stars
@@ -276,6 +319,11 @@ class Background:
             pygame.draw.circle(surface, WHITE, (int(cloud['x']), int(cloud['y'])), cloud['size'])
             pygame.draw.circle(surface, WHITE, (int(cloud['x'] + cloud['size']//2), int(cloud['y'])), cloud['size']//2)
             pygame.draw.circle(surface, WHITE, (int(cloud['x'] - cloud['size']//2), int(cloud['y'])), cloud['size']//2)
+    
+    def change_colors(self, sky_color, ground_color):
+        """Change the background colors"""
+        self.current_sky_color = sky_color
+        self.current_ground_color = ground_color
 
 class Spawner:
     """Handles obstacle spawning and difficulty progression"""
@@ -386,12 +434,17 @@ class Game:
         self.clock = pygame.time.Clock()
         self.font = pygame.font.Font(None, 36)
         self.big_font = pygame.font.Font(None, 72)
-        
-        self.state = GameState.MENU
-        self.reset_game()
+        self.retro_font = pygame.font.Font(None, 48)
+        self.retro_big_font = pygame.font.Font(None, 96)
         
         # Background
         self.background = Background()
+        
+        # Background milestone tracking
+        self.last_milestone = 0
+        
+        self.state = GameState.MENU
+        self.reset_game()
         
         # Music
         self.music_playing = False
@@ -401,31 +454,245 @@ class Game:
         self.high_score = self.load_high_score()
         
     def setup_music(self):
-        """Setup background music"""
+        """Setup procedural background music and separate menu/over loops."""
+        self.music_sound = None
+        self.menu_music_sound = None
+        self.over_music_sound = None
+        self.explosion_sound = None
         try:
-            # Create a simple beep pattern as background music
-            # Since we don't have external music files, we'll create a simple pattern
-            self.music_playing = False
-        except:
+            # Ensure mixer is initialized with predictable format
+            if not pygame.mixer.get_init():
+                pygame.mixer.init(frequency=44100, size=-16, channels=1, buffer=512)
+
+            def generate_music_sound(sample_rate: int = 44100) -> pygame.mixer.Sound:
+                # Simple 2-bar arpeggiated loop using sine waves
+                pattern = [
+                    (261.63, 0.20), (329.63, 0.20), (392.00, 0.20), (523.25, 0.40),  # C E G C5
+                    (392.00, 0.20), (329.63, 0.20), (261.63, 0.20), (196.00, 0.40),  # G E C G3
+                    (220.00, 0.20), (277.18, 0.20), (349.23, 0.20), (440.00, 0.40),  # A C# F A
+                    (349.23, 0.20), (277.18, 0.20), (220.00, 0.20), (174.61, 0.40),  # F C# A F3
+                ]
+
+                # ADSR-like simple envelope per note to avoid clicks
+                attack = 0.01
+                release = 0.04
+                volume = 0.18  # master volume (0..1)
+
+                samples = array('h')
+                two_pi = 2.0 * math.pi
+                phase = 0.0
+
+                for freq, dur in pattern:
+                    num = int(dur * sample_rate)
+                    step = two_pi * freq / sample_rate
+                    for i in range(num):
+                        t = i / sample_rate
+                        # Envelope
+                        env = 1.0
+                        if t < attack:
+                            env = t / attack
+                        elif t > (dur - release):
+                            env = max(0.0, (dur - t) / release)
+
+                        # Add a quiet second harmonic for richness
+                        s = math.sin(phase) * 0.8 + math.sin(phase * 2.0) * 0.2
+                        val = int(max(-1.0, min(1.0, s)) * env * volume * 32767)
+                        samples.append(val)
+                        phase += step
+
+                # Create Sound from raw samples; loop will repeat seamlessly
+                return pygame.mixer.Sound(buffer=samples)
+
+            self.music_sound = generate_music_sound()
+
+            def generate_relaxed_music_sound(sample_rate: int = 44100) -> pygame.mixer.Sound:
+                # Calm pad-like loop: slow chords with soft envelope
+                chords = [
+                    # (root, major third, fifth) as frequencies
+                    (261.63, 329.63, 392.00),  # C major
+                    (220.00, 277.18, 329.63),  # A minor/C#dim flavor (soft)
+                    (246.94, 311.13, 369.99),  # B♭ (relaxed)
+                    (233.08, 293.66, 349.23),  # B♭->A# style to F
+                ]
+
+                note_dur = 0.8
+                gap = 0.05
+                attack = 0.05
+                release = 0.2
+                volume = 0.12
+
+                samples = array('h')
+                two_pi = 2.0 * math.pi
+                t_global = 0.0
+
+                for (f1, f2, f3) in chords:
+                    total = int(note_dur * sample_rate)
+                    for i in range(total):
+                        t = i / sample_rate
+                        # Gentle LFO for movement
+                        lfo = 0.02 * math.sin(two_pi * 0.5 * (t_global + t))
+                        # Envelope
+                        env = 1.0
+                        if t < attack:
+                            env = t / attack
+                        elif t > (note_dur - release):
+                            env = max(0.0, (note_dur - t) / release)
+                        # Sum three sines, include quiet harmonics
+                        s = (
+                            math.sin(two_pi * (f1 + lfo) * (t_global + t)) * 0.6 +
+                            math.sin(two_pi * (f2 + lfo) * (t_global + t)) * 0.6 +
+                            math.sin(two_pi * (f3 + lfo) * (t_global + t)) * 0.6 +
+                            math.sin(two_pi * 2.0 * (f1 + lfo) * (t_global + t)) * 0.1
+                        ) / 3.0
+                        val = int(max(-1.0, min(1.0, s)) * env * volume * 32767)
+                        samples.append(val)
+
+                    # Small gap between chords
+                    gap_n = int(gap * sample_rate)
+                    for _ in range(gap_n):
+                        samples.append(0)
+                    t_global += note_dur + gap
+
+                return pygame.mixer.Sound(buffer=samples)
+
+            # Over/game-over relaxed track
+            self.over_music_sound = generate_relaxed_music_sound()
+
+            def generate_happy_menu_music(sample_rate: int = 44100) -> pygame.mixer.Sound:
+                # Bright, simple, happy arpeggio with light bell-like harmonics
+                scale = [261.63, 293.66, 329.63, 349.23, 392.00, 440.00, 493.88, 523.25]  # C major up to C5
+                pattern = []
+                # Build a short cheerful pattern
+                for f in [0, 2, 4, 7, 4, 2, 0, 7]:  # C E G B♭(approx via A: keep G)
+                    pattern.append((scale[f], 0.16))
+                for f in [4, 5, 7, 9 - 2, 7, 5, 4, 0]:  # G A C5 (approx) then back
+                    idx = max(0, min(len(scale) - 1, f))
+                    pattern.append((scale[idx], 0.16))
+
+                attack = 0.005
+                release = 0.06
+                volume = 0.14
+                two_pi = 2.0 * math.pi
+                samples = array('h')
+
+                for freq, dur in pattern:
+                    n = int(dur * sample_rate)
+                    step = two_pi * freq / sample_rate
+                    phase = 0.0
+                    for i in range(n):
+                        t = i / sample_rate
+                        env = 1.0
+                        if t < attack:
+                            env = t / attack
+                        elif t > (dur - release):
+                            env = max(0.0, (dur - t) / release)
+                        # Sine + a bit of triangle-like second harmonic via abs(sin)
+                        s = math.sin(phase) * 0.8 + (2.0 * abs(math.sin(phase)) - 1.0) * 0.2
+                        val = int(max(-1.0, min(1.0, s)) * env * volume * 32767)
+                        samples.append(val)
+                        phase += step
+
+                    # tiny gap between notes
+                    for _ in range(int(0.01 * sample_rate)):
+                        samples.append(0)
+
+                return pygame.mixer.Sound(buffer=samples)
+
+            # Menu happy loop
+            self.menu_music_sound = generate_happy_menu_music()
+
+            def generate_explosion_sound(sample_rate: int = 44100, duration: float = 0.6) -> pygame.mixer.Sound:
+                # Simple explosion: white noise burst + descending sine boom with exponential decay
+                total = int(duration * sample_rate)
+                samples = array('h')
+                rng = random.Random(1337)
+                two_pi = 2.0 * math.pi
+
+                # Parameters
+                start_freq = 220.0
+                end_freq = 55.0
+                boom_mix = 0.6  # boom vs noise
+                noise_mix = 0.7
+                max_amp = 0.9
+
+                for i in range(total):
+                    t = i / sample_rate
+                    # Exponential decay envelope
+                    env = math.exp(-4.0 * t)
+                    # Frequency sweep for boom
+                    f = end_freq + (start_freq - end_freq) * max(0.0, 1.0 - t / duration)
+                    phase = two_pi * f * t
+                    boom = math.sin(phase)
+                    noise = (rng.random() * 2.0 - 1.0)
+                    s = boom * boom_mix + noise * noise_mix
+                    val = int(max(-1.0, min(1.0, s)) * env * max_amp * 32767)
+                    samples.append(val)
+
+                return pygame.mixer.Sound(buffer=samples)
+
+            self.explosion_sound = generate_explosion_sound()
+        except Exception:
+            self.music_sound = None
+            self.menu_music_sound = None
+            self.over_music_sound = None
+            self.explosion_sound = None
+        finally:
             self.music_playing = False
             
     def start_music(self):
         """Start background music"""
-        if not self.music_playing:
+        if self.music_sound and not self.music_playing:
             try:
-                # For now, we'll just set a flag - in a real game you'd load music files
+                self.music_sound.set_volume(0.35)
+                self.music_sound.play(loops=-1)
                 self.music_playing = True
-            except:
-                pass
+            except Exception:
+                self.music_playing = False
+
+    def start_menu_music(self):
+        """Start happy relaxed loop for MENU."""
+        try:
+            if self.menu_music_sound:
+                self.menu_music_sound.set_volume(0.26)
+                self.menu_music_sound.play(loops=-1)
+        except Exception:
+            pass
+
+    def start_over_music(self):
+        """Start calm relaxed loop for GAME OVER."""
+        try:
+            if self.over_music_sound:
+                self.over_music_sound.set_volume(0.24)
+                self.over_music_sound.play(loops=-1)
+        except Exception:
+            pass
                 
     def stop_music(self):
-        """Stop background music"""
-        if self.music_playing:
-            try:
-                pygame.mixer.music.stop()
-                self.music_playing = False
-            except:
-                self.music_playing = False
+        """Stop all background music loops (gameplay and relaxed)."""
+        try:
+            if self.music_sound:
+                self.music_sound.stop()
+        finally:
+            self.music_playing = False
+        try:
+            if self.menu_music_sound:
+                self.menu_music_sound.stop()
+        except Exception:
+            pass
+        try:
+            if self.over_music_sound:
+                self.over_music_sound.stop()
+        except Exception:
+            pass
+
+    def play_game_over_sfx(self):
+        """Play explosion SFX once on game over."""
+        try:
+            if self.explosion_sound:
+                self.explosion_sound.set_volume(0.6)
+                self.explosion_sound.play()
+        except Exception:
+            pass
         
     def reset_game(self):
         """Reset game to initial state"""
@@ -435,6 +702,9 @@ class Game:
         self.score = 0
         self.game_start_time = 0
         self.scroll_speed = BASE_SPEED
+        self.last_milestone = 0
+        # Reset background to default colors
+        self.background.change_colors(LIGHT_BLUE, DARK_BLUE)
         
     def load_high_score(self) -> int:
         """Load high score from file"""
@@ -453,6 +723,58 @@ class Game:
                 f.write(str(self.high_score))
         except IOError:
             pass
+    
+    def check_background_milestones(self):
+        """Check if score has reached a milestone and change background colors"""
+        milestones = [10, 25, 50, 100, 200]
+        
+        for milestone in milestones:
+            if self.score >= milestone and self.last_milestone < milestone:
+                self.last_milestone = milestone
+                
+                if milestone == 10:
+                    # Sunset theme
+                    self.background.change_colors(SUNSET_SKY, SUNSET_GROUND)
+                elif milestone == 25:
+                    # Night theme
+                    self.background.change_colors(NIGHT_SKY, NIGHT_GROUND)
+                elif milestone == 50:
+                    # Rainbow theme
+                    self.background.change_colors(RAINBOW_SKY, RAINBOW_GROUND)
+                elif milestone == 100:
+                    # Back to sunset
+                    self.background.change_colors(SUNSET_SKY, SUNSET_GROUND)
+                elif milestone == 200:
+                    # Back to night
+                    self.background.change_colors(NIGHT_SKY, NIGHT_GROUND)
+                break
+    
+    def get_funny_phrase(self):
+        """Get a funny phrase based on the score"""
+        if self.score == 0:
+            return "Did you even try? "
+        elif self.score < 5:
+            return "Better luck next time! "
+        elif self.score < 10:
+            return "Getting there! Keep practicing! "
+        elif self.score < 15:
+            return "Not bad! You're improving! "
+        elif self.score < 25:
+            return "Good job! You're getting the hang of it! "
+        elif self.score < 35:
+            return "Nice! You're becoming a pro! "
+        elif self.score < 50:
+            return "Excellent! You're really good at this! "
+        elif self.score < 75:
+            return "Amazing! You're a geometry master! "
+        elif self.score < 100:
+            return "Incredible! You're unstoppable! "
+        elif self.score < 150:
+            return "Legendary! You're a gaming god! "
+        elif self.score < 200:
+            return "Mind-blowing! You're beyond human! "
+        else:
+            return "IMPOSSIBLE! You must be cheating! "
             
     def handle_events(self):
         """Handle pygame events"""
@@ -467,12 +789,16 @@ class Game:
                     elif self.state == GameState.GAME_OVER:
                         return False
                     else:
+                        # Exit to menu: stop gameplay music, start menu music
                         self.state = GameState.MENU
+                        self.stop_music()
+                        self.start_menu_music()
                         
                 elif self.state == GameState.MENU:
                     if event.key != pygame.K_ESCAPE:
                         self.state = GameState.PLAYING
                         self.game_start_time = pygame.time.get_ticks() / 1000.0
+                        self.stop_music()
                         self.start_music()
                         
                 elif self.state == GameState.PLAYING:
@@ -484,6 +810,7 @@ class Game:
                         self.reset_game()
                         self.state = GameState.PLAYING
                         self.game_start_time = pygame.time.get_ticks() / 1000.0
+                        self.stop_music()
                         self.start_music()
                         
         return True
@@ -511,6 +838,7 @@ class Game:
         if collision_result == "deadly_collision":
             self.state = GameState.GAME_OVER
             self.stop_music()
+            self.play_game_over_sfx()
             if self.score > self.high_score:
                 self.high_score = self.score
                 self.save_high_score()
@@ -530,6 +858,9 @@ class Game:
                 obstacle.scored = True
                 self.score += 1
                 
+                # Check for background color milestones
+                self.check_background_milestones()
+                
             # Remove off-screen obstacles
             if obstacle.is_off_screen():
                 self.obstacles.remove(obstacle)
@@ -540,6 +871,7 @@ class Game:
                 # Spikes are deadly
                 self.state = GameState.GAME_OVER
                 self.stop_music()
+                self.play_game_over_sfx()
                 if self.score > self.high_score:
                     self.high_score = self.score
                     self.save_high_score()
@@ -548,107 +880,172 @@ class Game:
                 
     def draw_menu(self):
         """Draw the welcome/menu screen"""
-        # Draw animated background
-        self.background.draw(self.screen)
-        self.background.update(0.016, 50)  # Slow animation
-        
-        # Semi-transparent overlay
-        overlay = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT))
-        overlay.set_alpha(128)
-        overlay.fill(BLACK)
-        self.screen.blit(overlay, (0, 0))
-        
-        # Title with shadow effect
-        title_text = self.big_font.render("GEOMETRY DASH CLONE", True, WHITE)
-        title_shadow = self.big_font.render("GEOMETRY DASH CLONE", True, PURPLE)
-        title_rect = title_text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 - 120))
-        shadow_rect = title_shadow.get_rect(center=(SCREEN_WIDTH // 2 + 3, SCREEN_HEIGHT // 2 - 117))
-        self.screen.blit(title_shadow, shadow_rect)
-        self.screen.blit(title_text, title_rect)
-        
-        # Controls with better formatting
-        controls_title = self.font.render("CONTROLS:", True, WHITE)
-        controls_title_rect = controls_title.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 - 40))
-        self.screen.blit(controls_title, controls_title_rect)
-        
-        controls = [
-            "SPACE or UP - Jump (Double Jump!)",
-            "DOWN - Fast fall",
-            "ESC - Quit"
-        ]
-        
-        y_offset = SCREEN_HEIGHT // 2 - 10
-        for i, control in enumerate(controls):
-            text = self.font.render(control, True, LIGHT_BLUE)
-            text_rect = text.get_rect(center=(SCREEN_WIDTH // 2, y_offset + i * 35))
-            self.screen.blit(text, text_rect)
-            
-        # Game features
-        features_title = self.font.render("FEATURES:", True, WHITE)
-        features_title_rect = features_title.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 + 80))
-        self.screen.blit(features_title, features_title_rect)
-        
-        features = [
-            "• Jump on brown platforms",
-            "• Avoid red spikes",
-            "• Use horizontal platforms",
-            "• Survive as long as possible!"
-        ]
-        
-        y_offset = SCREEN_HEIGHT // 2 + 110
-        for i, feature in enumerate(features):
-            text = self.font.render(feature, True, GREEN)
-            text_rect = text.get_rect(center=(SCREEN_WIDTH // 2, y_offset + i * 30))
-            self.screen.blit(text, text_rect)
-            
-        # Start instruction with pulsing effect
-        pulse = int(127 + 127 * math.sin(pygame.time.get_ticks() * 0.005))
-        start_color = (pulse, 255, pulse)
-        start_text = self.font.render("Press any key to start", True, start_color)
-        start_rect = start_text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 + 250))
-        self.screen.blit(start_text, start_rect)
-        
-        # High score
-        if self.high_score > 0:
-            hs_text = self.font.render(f"High Score: {self.high_score}", True, WHITE)
-            hs_rect = hs_text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 + 290))
-            self.screen.blit(hs_text, hs_rect)
-            
-    def draw_game_over(self):
-        """Draw the game over screen"""
+        # Ensure happy music is playing on menu
+        self.start_menu_music()
+        # Retro arcade background to match game over style
         self.screen.fill(BLACK)
         
-        # Game Over text
-        game_over_text = self.big_font.render("GAME OVER", True, RED)
-        game_over_rect = game_over_text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 - 100))
-        self.screen.blit(game_over_text, game_over_rect)
+        # Scanlines
+        for y in range(0, SCREEN_HEIGHT, 4):
+            pygame.draw.line(self.screen, (0, 0, 0), (0, y), (SCREEN_WIDTH, y), 1)
         
-        # Final score
-        score_text = self.font.render(f"Final Score: {self.score}", True, WHITE)
-        score_rect = score_text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 - 40))
+        # Grid
+        for x in range(0, SCREEN_WIDTH, 20):
+            pygame.draw.line(self.screen, (20, 20, 20), (x, 0), (x, SCREEN_HEIGHT), 1)
+        for y in range(0, SCREEN_HEIGHT, 20):
+            pygame.draw.line(self.screen, (20, 20, 20), (0, y), (SCREEN_WIDTH, y), 1)
+        
+        # Pulsing border like game over
+        pulse = int(127 + 127 * math.sin(pygame.time.get_ticks() * 0.008))
+        border_color = (pulse, 0, pulse)
+        pygame.draw.rect(self.screen, border_color, (10, 10, SCREEN_WIDTH - 20, SCREEN_HEIGHT - 20), 5)
+        
+        # Main title with retro big font and shadow
+        title_main = self.retro_big_font.render("GEOMETRY DASH", True, NEON_PINK)
+        title_shadow = self.retro_big_font.render("GEOMETRY DASH", True, ARCADE_PURPLE)
+        shadow_rect = title_main.get_rect(center=(SCREEN_WIDTH // 2 + 3, SCREEN_HEIGHT // 2 - 120))
+        main_rect = title_main.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 - 120))
+        self.screen.blit(title_shadow, shadow_rect)
+        self.screen.blit(title_main, main_rect)
+        
+        # Decorative lines
+        pygame.draw.line(self.screen, NEON_CYAN, (SCREEN_WIDTH // 2 - 220, SCREEN_HEIGHT // 2 - 80),
+                         (SCREEN_WIDTH // 2 + 220, SCREEN_HEIGHT // 2 - 80), 3)
+        pygame.draw.line(self.screen, NEON_CYAN, (SCREEN_WIDTH // 2 - 220, SCREEN_HEIGHT // 2 - 60),
+                         (SCREEN_WIDTH // 2 + 220, SCREEN_HEIGHT // 2 - 60), 3)
+        
+        # Controls block using retro font
+        controls_title = self.retro_font.render("CONTROLS", True, NEON_YELLOW)
+        self.screen.blit(controls_title, controls_title.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 - 20)))
+        controls = [
+            "SPACE/UP: JUMP",
+            "DOWN: FAST FALL",
+            "ESC: QUIT",
+        ]
+        for i, text_val in enumerate(controls):
+            c_text = self.font.render(text_val, True, NEON_BLUE)
+            self.screen.blit(c_text, c_text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 + 10 + i * 32)))
+        
+        # Start prompt with pulsing neon
+        pulse2 = int(127 + 127 * math.sin(pygame.time.get_ticks() * 0.005))
+        start_color = (pulse2, pulse2, 255)
+        start_text = self.retro_font.render("PRESS ANY KEY TO START", True, start_color)
+        self.screen.blit(start_text, start_text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 + 120)))
+        
+        # High score (if any)
+        if self.high_score > 0:
+            hs_text = self.retro_font.render(f"HIGH SCORE: {self.high_score:04d}", True, ARCADE_CYAN)
+            self.screen.blit(hs_text, hs_text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 + 160)))
+        
+        # Retro corner decorations
+        corner_size = 30
+        pygame.draw.line(self.screen, NEON_GREEN, (50, 50), (50 + corner_size, 50), 3)
+        pygame.draw.line(self.screen, NEON_GREEN, (50, 50), (50, 50 + corner_size), 3)
+        pygame.draw.line(self.screen, NEON_GREEN, (SCREEN_WIDTH - 50, 50), (SCREEN_WIDTH - 50 - corner_size, 50), 3)
+        pygame.draw.line(self.screen, NEON_GREEN, (SCREEN_WIDTH - 50, 50), (SCREEN_WIDTH - 50, 50 + corner_size), 3)
+        pygame.draw.line(self.screen, NEON_GREEN, (50, SCREEN_HEIGHT - 50), (50 + corner_size, SCREEN_HEIGHT - 50), 3)
+        pygame.draw.line(self.screen, NEON_GREEN, (50, SCREEN_HEIGHT - 50), (50, SCREEN_HEIGHT - 50 - corner_size), 3)
+        pygame.draw.line(self.screen, NEON_GREEN, (SCREEN_WIDTH - 50, SCREEN_HEIGHT - 50), (SCREEN_WIDTH - 50 - corner_size, SCREEN_HEIGHT - 50), 3)
+        pygame.draw.line(self.screen, NEON_GREEN, (SCREEN_WIDTH - 50, SCREEN_HEIGHT - 50), (SCREEN_WIDTH - 50, SCREEN_HEIGHT - 50 - corner_size), 3)
+            
+    def draw_game_over(self):
+        """Draw the retro arcade style game over screen"""
+        # Ensure calm relaxed music is playing on game over
+        self.start_over_music()
+        # Retro arcade background with scanlines effect
+        self.screen.fill(BLACK)
+        
+        # Add scanlines effect
+        for y in range(0, SCREEN_HEIGHT, 4):
+            pygame.draw.line(self.screen, (0, 0, 0), (0, y), (SCREEN_WIDTH, y), 1)
+        
+        # Add some retro grid pattern
+        for x in range(0, SCREEN_WIDTH, 20):
+            pygame.draw.line(self.screen, (20, 20, 20), (x, 0), (x, SCREEN_HEIGHT), 1)
+        for y in range(0, SCREEN_HEIGHT, 20):
+            pygame.draw.line(self.screen, (20, 20, 20), (0, y), (SCREEN_WIDTH, y), 1)
+        
+        # Pulsing border effect
+        pulse = int(127 + 127 * math.sin(pygame.time.get_ticks() * 0.008))
+        border_color = (pulse, 0, pulse)
+        pygame.draw.rect(self.screen, border_color, (10, 10, SCREEN_WIDTH - 20, SCREEN_HEIGHT - 20), 5)
+        
+        # Main "GAME OVER" text with retro styling
+        game_over_text = self.retro_big_font.render("GAME OVER", True, ARCADE_RED)
+        game_over_shadow = self.retro_big_font.render("GAME OVER", True, NEON_PINK)
+        
+        # Add shadow effect
+        shadow_rect = game_over_text.get_rect(center=(SCREEN_WIDTH // 2 + 3, SCREEN_HEIGHT // 2 - 120))
+        main_rect = game_over_text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 - 120))
+        
+        self.screen.blit(game_over_shadow, shadow_rect)
+        self.screen.blit(game_over_text, main_rect)
+        
+        # Add decorative lines
+        pygame.draw.line(self.screen, NEON_CYAN, (SCREEN_WIDTH // 2 - 200, SCREEN_HEIGHT // 2 - 80), 
+                        (SCREEN_WIDTH // 2 + 200, SCREEN_HEIGHT // 2 - 80), 3)
+        pygame.draw.line(self.screen, NEON_CYAN, (SCREEN_WIDTH // 2 - 200, SCREEN_HEIGHT // 2 - 60), 
+                        (SCREEN_WIDTH // 2 + 200, SCREEN_HEIGHT // 2 - 60), 3)
+        
+        # Final score with retro styling
+        score_text = self.retro_font.render(f"FINAL SCORE: {self.score:04d}", True, NEON_GREEN)
+        score_rect = score_text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 - 20))
         self.screen.blit(score_text, score_rect)
         
-        # High score
+        # Funny phrase with retro colors
+        funny_phrase = self.get_funny_phrase()
+        phrase_color = NEON_YELLOW if self.score >= 50 else NEON_ORANGE if self.score >= 25 else NEON_BLUE
+        phrase_text = self.font.render(funny_phrase, True, phrase_color)
+        phrase_rect = phrase_text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 + 20))
+        self.screen.blit(phrase_text, phrase_rect)
+        
+        # High score section with retro styling
         if self.score == self.high_score and self.score > 0:
-            new_high_text = self.font.render("NEW HIGH SCORE!", True, GREEN)
-            new_high_rect = new_high_text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2))
+            # Blinking effect for new high score
+            blink = int(255 * abs(math.sin(pygame.time.get_ticks() * 0.01)))
+            new_high_text = self.retro_font.render("*** NEW HIGH SCORE! ***", True, (blink, 255, blink))
+            new_high_rect = new_high_text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 + 60))
             self.screen.blit(new_high_text, new_high_rect)
         else:
-            hs_text = self.font.render(f"High Score: {self.high_score}", True, GRAY)
-            hs_rect = hs_text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2))
+            hs_text = self.retro_font.render(f"HIGH SCORE: {self.high_score:04d}", True, ARCADE_PURPLE)
+            hs_rect = hs_text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 + 60))
             self.screen.blit(hs_text, hs_rect)
+        
+        # Add more decorative lines
+        pygame.draw.line(self.screen, NEON_CYAN, (SCREEN_WIDTH // 2 - 200, SCREEN_HEIGHT // 2 + 100), 
+                        (SCREEN_WIDTH // 2 + 200, SCREEN_HEIGHT // 2 + 100), 3)
+        pygame.draw.line(self.screen, NEON_CYAN, (SCREEN_WIDTH // 2 - 200, SCREEN_HEIGHT // 2 + 120), 
+                        (SCREEN_WIDTH // 2 + 200, SCREEN_HEIGHT // 2 + 120), 3)
             
-        # Options
+        # Retro arcade style options
         options = [
-            "[R] Retry",
-            "[ESC] Quit"
+            "PRESS [R] TO RETRY",
+            "PRESS [ESC] TO QUIT"
         ]
         
-        y_offset = SCREEN_HEIGHT // 2 + 60
+        y_offset = SCREEN_HEIGHT // 2 + 150
         for i, option in enumerate(options):
-            text = self.font.render(option, True, WHITE)
-            text_rect = text.get_rect(center=(SCREEN_WIDTH // 2, y_offset + i * 40))
+            # Pulsing effect for options
+            pulse = int(127 + 127 * math.sin(pygame.time.get_ticks() * 0.005 + i))
+            option_color = (pulse, pulse, 255)
+            text = self.retro_font.render(option, True, option_color)
+            text_rect = text.get_rect(center=(SCREEN_WIDTH // 2, y_offset + i * 50))
             self.screen.blit(text, text_rect)
+        
+        # Add some retro corner decorations
+        corner_size = 30
+        # Top-left corner
+        pygame.draw.line(self.screen, NEON_GREEN, (50, 50), (50 + corner_size, 50), 3)
+        pygame.draw.line(self.screen, NEON_GREEN, (50, 50), (50, 50 + corner_size), 3)
+        # Top-right corner
+        pygame.draw.line(self.screen, NEON_GREEN, (SCREEN_WIDTH - 50, 50), (SCREEN_WIDTH - 50 - corner_size, 50), 3)
+        pygame.draw.line(self.screen, NEON_GREEN, (SCREEN_WIDTH - 50, 50), (SCREEN_WIDTH - 50, 50 + corner_size), 3)
+        # Bottom-left corner
+        pygame.draw.line(self.screen, NEON_GREEN, (50, SCREEN_HEIGHT - 50), (50 + corner_size, SCREEN_HEIGHT - 50), 3)
+        pygame.draw.line(self.screen, NEON_GREEN, (50, SCREEN_HEIGHT - 50), (50, SCREEN_HEIGHT - 50 - corner_size), 3)
+        # Bottom-right corner
+        pygame.draw.line(self.screen, NEON_GREEN, (SCREEN_WIDTH - 50, SCREEN_HEIGHT - 50), (SCREEN_WIDTH - 50 - corner_size, SCREEN_HEIGHT - 50), 3)
+        pygame.draw.line(self.screen, NEON_GREEN, (SCREEN_WIDTH - 50, SCREEN_HEIGHT - 50), (SCREEN_WIDTH - 50, SCREEN_HEIGHT - 50 - corner_size), 3)
             
     def draw_hud(self):
         """Draw the heads-up display"""

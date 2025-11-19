@@ -1,0 +1,2 @@
+ros_game:ros_game_msgs
+-DCATKIN_DEVEL_PREFIX=/home/aina/RP_Crespi_Campos_Perez_25/catkin_ws/devel -DCMAKE_INSTALL_PREFIX=/home/aina/RP_Crespi_Campos_Perez_25/catkin_ws/install -G Unix Makefiles

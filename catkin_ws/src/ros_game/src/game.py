@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 """
 Geometry Dash-style Side-scrolling Game
 
@@ -1219,7 +1217,7 @@ class Game:
         # Aquí es un buen sitio para hacer algo con self.score si lo necesitas
         return running
 
-    def user_info_callback(self, msg: user_msg):
+    def user_callback(self, msg: user_msg):
         """Recibe name, username y age desde INFO_USER."""
         self.user_name = msg.name
         self.user_username = msg.username

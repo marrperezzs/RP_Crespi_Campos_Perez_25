@@ -17,6 +17,9 @@ import rospy
 from std_msgs.msg import String, Int64
 from ros_game_msgs.msg import user_msg
 
+from ros_game.srv import GetUserScore, GetUserScoreResponse
+from ros_game.srv import SetGameDifficulty, SetGameDifficultyResponse
+
 
 
 import pygame
@@ -449,6 +452,15 @@ class Game:
 
         rospy.loginfo("Game initialized, waiting for user info...")
 
+        self.user_scores = {}
+        self.current_difficulty = "medium"
+        self.speed_multiplier = 1.0  # Default speed multiplier
+
+        self.user_score_srv = rospy.Service('/user_score', GetUserScore, self.handle_user_score)
+        self.set_difficulty_srv = rospy.Service('/difficulty', SetGameDifficulty, self.handle_set_difficulty)
+
+        rospy.loginfo("Services ready.")
+
         pygame.init()
         pygame.mixer.init()
         self.screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
@@ -872,7 +884,9 @@ class Game:
         game_time = current_time - self.game_start_time
         
         # Update difficulty
-        self.scroll_speed = min(MAX_SPEED, BASE_SPEED + (game_time * SPEED_INCREMENT))
+        base_speed = BASE_SPEED + (game_time * SPEED_INCREMENT)
+        self.scroll_speed = min(MAX_SPEED, base_speed * self.speed_multiplier)
+        #self.scroll_speed = min(MAX_SPEED, BASE_SPEED + (game_time * SPEED_INCREMENT))
         
         # Handle fast fall
         keys = pygame.key.get_pressed()
@@ -1233,6 +1247,50 @@ class Game:
         """Recibe comandos de movimiento desde CONTROL_NODE."""
         self.last_command = msg.data.upper()
         rospy.loginfo("GAME_NODE: Received keyboard command: %s", self.last_command)
+
+    def handle_user_score(self, req: GetUserScore) -> GetUserScoreResponse:
+        """Servicio para obtener el score del usuario."""
+        response = GetUserScoreResponse()
+        response.score = self.score
+        rospy.loginfo("GAME_NODE: User score requested, current score: %d", self.score)
+        return response
+
+    def handle_set_difficulty(self, req: SetGameDifficulty) -> SetGameDifficultyResponse:
+        """
+        Servicio 'difficulty':
+        - req.level: 'easy', 'medium' o 'hard'
+        - Solo permite cambiar si estamos en fase de menú (por ejemplo GameState.MENU)
+        """
+        level = req.change_difficulty.lower()
+
+        # Aquí puedes comprobar tu estado de juego; por ejemplo:
+        if self.state != GameState.MENU:
+            rospy.loginfo("SERVICE difficulty: no estamos en fase 1, rechazado.")
+            return SetGameDifficultyResponse(success=False)
+
+        if level not in ("easy", "medium", "hard"):
+            rospy.logwarn("SERVICE difficulty: invalid level '%s'", level)
+            return SetGameDifficultyResponse(success=False)
+
+        self.current_difficulty = level
+        self.apply_difficulty_settings()
+
+        rospy.loginfo("SERVICE difficulty: difficulty changed to '%s'", level)
+
+        return SetGameDifficultyResponse(success=True)
+
+
+    def apply_difficulty_settings(self):
+        """Ajusta parámetros del juego según la dificultad actual."""
+        if self.current_difficulty == "easy":
+            self.speed_multiplier = 0.8
+        elif self.current_difficulty == "medium":
+            self.speed_multiplier = 1.0
+        elif self.current_difficulty == "hard":
+            self.speed_multiplier = 1.2
+        else:
+            # Por si acaso llega algo raro
+            self.speed_multiplier = 1.0
 
 
     def run(self):

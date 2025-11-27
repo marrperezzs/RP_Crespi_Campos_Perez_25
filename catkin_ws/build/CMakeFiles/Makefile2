@@ -139,7 +139,7 @@ gtest/googletest/clean: gtest/googletest/CMakeFiles/gtest.dir/clean
 # Directory level rules for directory ros_game
 
 # Recursive "all" directory target.
-ros_game/all:
+ros_game/all: ros_game/CMakeFiles/ros_game_generate_messages.dir/all
 
 .PHONY : ros_game/all
 
@@ -149,7 +149,19 @@ ros_game/preinstall:
 .PHONY : ros_game/preinstall
 
 # Recursive "clean" directory target.
-ros_game/clean:
+ros_game/clean: ros_game/CMakeFiles/_ros_game_generate_messages_check_deps_SetGameDifficulty.dir/clean
+ros_game/clean: ros_game/CMakeFiles/_ros_game_generate_messages_check_deps_GetUserScore.dir/clean
+ros_game/clean: ros_game/CMakeFiles/ros_game_geneus.dir/clean
+ros_game/clean: ros_game/CMakeFiles/ros_game_generate_messages.dir/clean
+ros_game/clean: ros_game/CMakeFiles/ros_game_generate_messages_cpp.dir/clean
+ros_game/clean: ros_game/CMakeFiles/ros_game_gencpp.dir/clean
+ros_game/clean: ros_game/CMakeFiles/ros_game_genlisp.dir/clean
+ros_game/clean: ros_game/CMakeFiles/ros_game_gennodejs.dir/clean
+ros_game/clean: ros_game/CMakeFiles/ros_game_generate_messages_eus.dir/clean
+ros_game/clean: ros_game/CMakeFiles/ros_game_generate_messages_lisp.dir/clean
+ros_game/clean: ros_game/CMakeFiles/ros_game_generate_messages_nodejs.dir/clean
+ros_game/clean: ros_game/CMakeFiles/ros_game_generate_messages_py.dir/clean
+ros_game/clean: ros_game/CMakeFiles/ros_game_genpy.dir/clean
 
 .PHONY : ros_game/clean
 
@@ -467,7 +479,7 @@ ros_game_msgs/CMakeFiles/ros_game_msgs_generate_messages_py.dir/all: ros_game_ms
 ros_game_msgs/CMakeFiles/ros_game_msgs_generate_messages_py.dir/all: ros_game_msgs/CMakeFiles/_ros_game_msgs_generate_messages_check_deps_user_msg.dir/all
 	$(MAKE) -f ros_game_msgs/CMakeFiles/ros_game_msgs_generate_messages_py.dir/build.make ros_game_msgs/CMakeFiles/ros_game_msgs_generate_messages_py.dir/depend
 	$(MAKE) -f ros_game_msgs/CMakeFiles/ros_game_msgs_generate_messages_py.dir/build.make ros_game_msgs/CMakeFiles/ros_game_msgs_generate_messages_py.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/aina/RP_Crespi_Campos_Perez_25/catkin_ws/build/CMakeFiles --progress-num=14,15 "Built target ros_game_msgs_generate_messages_py"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/aina/RP_Crespi_Campos_Perez_25/catkin_ws/build/CMakeFiles --progress-num=26,27 "Built target ros_game_msgs_generate_messages_py"
 .PHONY : ros_game_msgs/CMakeFiles/ros_game_msgs_generate_messages_py.dir/all
 
 # Build rule for subdir invocation for target.
@@ -522,7 +534,7 @@ ros_game_msgs/CMakeFiles/ros_game_msgs_generate_messages_nodejs.dir/all: ros_gam
 ros_game_msgs/CMakeFiles/ros_game_msgs_generate_messages_nodejs.dir/all: ros_game_msgs/CMakeFiles/_ros_game_msgs_generate_messages_check_deps_user_msg.dir/all
 	$(MAKE) -f ros_game_msgs/CMakeFiles/ros_game_msgs_generate_messages_nodejs.dir/build.make ros_game_msgs/CMakeFiles/ros_game_msgs_generate_messages_nodejs.dir/depend
 	$(MAKE) -f ros_game_msgs/CMakeFiles/ros_game_msgs_generate_messages_nodejs.dir/build.make ros_game_msgs/CMakeFiles/ros_game_msgs_generate_messages_nodejs.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/aina/RP_Crespi_Campos_Perez_25/catkin_ws/build/CMakeFiles --progress-num=13 "Built target ros_game_msgs_generate_messages_nodejs"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/aina/RP_Crespi_Campos_Perez_25/catkin_ws/build/CMakeFiles --progress-num=25 "Built target ros_game_msgs_generate_messages_nodejs"
 .PHONY : ros_game_msgs/CMakeFiles/ros_game_msgs_generate_messages_nodejs.dir/all
 
 # Build rule for subdir invocation for target.
@@ -631,7 +643,7 @@ ros_game_msgs/CMakeFiles/ros_game_msgs_generate_messages_lisp.dir/all: ros_game_
 ros_game_msgs/CMakeFiles/ros_game_msgs_generate_messages_lisp.dir/all: ros_game_msgs/CMakeFiles/_ros_game_msgs_generate_messages_check_deps_user_msg.dir/all
 	$(MAKE) -f ros_game_msgs/CMakeFiles/ros_game_msgs_generate_messages_lisp.dir/build.make ros_game_msgs/CMakeFiles/ros_game_msgs_generate_messages_lisp.dir/depend
 	$(MAKE) -f ros_game_msgs/CMakeFiles/ros_game_msgs_generate_messages_lisp.dir/build.make ros_game_msgs/CMakeFiles/ros_game_msgs_generate_messages_lisp.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/aina/RP_Crespi_Campos_Perez_25/catkin_ws/build/CMakeFiles --progress-num=12 "Built target ros_game_msgs_generate_messages_lisp"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/aina/RP_Crespi_Campos_Perez_25/catkin_ws/build/CMakeFiles --progress-num=24 "Built target ros_game_msgs_generate_messages_lisp"
 .PHONY : ros_game_msgs/CMakeFiles/ros_game_msgs_generate_messages_lisp.dir/all
 
 # Build rule for subdir invocation for target.
@@ -879,7 +891,7 @@ ros_game_msgs/CMakeFiles/ros_game_msgs_generate_messages_cpp.dir/all: ros_game_m
 ros_game_msgs/CMakeFiles/ros_game_msgs_generate_messages_cpp.dir/all: ros_game_msgs/CMakeFiles/_ros_game_msgs_generate_messages_check_deps_user_msg.dir/all
 	$(MAKE) -f ros_game_msgs/CMakeFiles/ros_game_msgs_generate_messages_cpp.dir/build.make ros_game_msgs/CMakeFiles/ros_game_msgs_generate_messages_cpp.dir/depend
 	$(MAKE) -f ros_game_msgs/CMakeFiles/ros_game_msgs_generate_messages_cpp.dir/build.make ros_game_msgs/CMakeFiles/ros_game_msgs_generate_messages_cpp.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/aina/RP_Crespi_Campos_Perez_25/catkin_ws/build/CMakeFiles --progress-num=9 "Built target ros_game_msgs_generate_messages_cpp"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/aina/RP_Crespi_Campos_Perez_25/catkin_ws/build/CMakeFiles --progress-num=21 "Built target ros_game_msgs_generate_messages_cpp"
 .PHONY : ros_game_msgs/CMakeFiles/ros_game_msgs_generate_messages_cpp.dir/all
 
 # Build rule for subdir invocation for target.
@@ -907,7 +919,7 @@ ros_game_msgs/CMakeFiles/ros_game_msgs_generate_messages_eus.dir/all: ros_game_m
 ros_game_msgs/CMakeFiles/ros_game_msgs_generate_messages_eus.dir/all: ros_game_msgs/CMakeFiles/_ros_game_msgs_generate_messages_check_deps_user_msg.dir/all
 	$(MAKE) -f ros_game_msgs/CMakeFiles/ros_game_msgs_generate_messages_eus.dir/build.make ros_game_msgs/CMakeFiles/ros_game_msgs_generate_messages_eus.dir/depend
 	$(MAKE) -f ros_game_msgs/CMakeFiles/ros_game_msgs_generate_messages_eus.dir/build.make ros_game_msgs/CMakeFiles/ros_game_msgs_generate_messages_eus.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/aina/RP_Crespi_Campos_Perez_25/catkin_ws/build/CMakeFiles --progress-num=10,11 "Built target ros_game_msgs_generate_messages_eus"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/aina/RP_Crespi_Campos_Perez_25/catkin_ws/build/CMakeFiles --progress-num=22,23 "Built target ros_game_msgs_generate_messages_eus"
 .PHONY : ros_game_msgs/CMakeFiles/ros_game_msgs_generate_messages_eus.dir/all
 
 # Build rule for subdir invocation for target.
@@ -926,6 +938,371 @@ ros_game_msgs_generate_messages_eus: ros_game_msgs/CMakeFiles/ros_game_msgs_gene
 ros_game_msgs/CMakeFiles/ros_game_msgs_generate_messages_eus.dir/clean:
 	$(MAKE) -f ros_game_msgs/CMakeFiles/ros_game_msgs_generate_messages_eus.dir/build.make ros_game_msgs/CMakeFiles/ros_game_msgs_generate_messages_eus.dir/clean
 .PHONY : ros_game_msgs/CMakeFiles/ros_game_msgs_generate_messages_eus.dir/clean
+
+#=============================================================================
+# Target rules for target ros_game/CMakeFiles/_ros_game_generate_messages_check_deps_SetGameDifficulty.dir
+
+# All Build rule for target.
+ros_game/CMakeFiles/_ros_game_generate_messages_check_deps_SetGameDifficulty.dir/all:
+	$(MAKE) -f ros_game/CMakeFiles/_ros_game_generate_messages_check_deps_SetGameDifficulty.dir/build.make ros_game/CMakeFiles/_ros_game_generate_messages_check_deps_SetGameDifficulty.dir/depend
+	$(MAKE) -f ros_game/CMakeFiles/_ros_game_generate_messages_check_deps_SetGameDifficulty.dir/build.make ros_game/CMakeFiles/_ros_game_generate_messages_check_deps_SetGameDifficulty.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/aina/RP_Crespi_Campos_Perez_25/catkin_ws/build/CMakeFiles --progress-num= "Built target _ros_game_generate_messages_check_deps_SetGameDifficulty"
+.PHONY : ros_game/CMakeFiles/_ros_game_generate_messages_check_deps_SetGameDifficulty.dir/all
+
+# Build rule for subdir invocation for target.
+ros_game/CMakeFiles/_ros_game_generate_messages_check_deps_SetGameDifficulty.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/aina/RP_Crespi_Campos_Perez_25/catkin_ws/build/CMakeFiles 0
+	$(MAKE) -f CMakeFiles/Makefile2 ros_game/CMakeFiles/_ros_game_generate_messages_check_deps_SetGameDifficulty.dir/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/aina/RP_Crespi_Campos_Perez_25/catkin_ws/build/CMakeFiles 0
+.PHONY : ros_game/CMakeFiles/_ros_game_generate_messages_check_deps_SetGameDifficulty.dir/rule
+
+# Convenience name for target.
+_ros_game_generate_messages_check_deps_SetGameDifficulty: ros_game/CMakeFiles/_ros_game_generate_messages_check_deps_SetGameDifficulty.dir/rule
+
+.PHONY : _ros_game_generate_messages_check_deps_SetGameDifficulty
+
+# clean rule for target.
+ros_game/CMakeFiles/_ros_game_generate_messages_check_deps_SetGameDifficulty.dir/clean:
+	$(MAKE) -f ros_game/CMakeFiles/_ros_game_generate_messages_check_deps_SetGameDifficulty.dir/build.make ros_game/CMakeFiles/_ros_game_generate_messages_check_deps_SetGameDifficulty.dir/clean
+.PHONY : ros_game/CMakeFiles/_ros_game_generate_messages_check_deps_SetGameDifficulty.dir/clean
+
+#=============================================================================
+# Target rules for target ros_game/CMakeFiles/_ros_game_generate_messages_check_deps_GetUserScore.dir
+
+# All Build rule for target.
+ros_game/CMakeFiles/_ros_game_generate_messages_check_deps_GetUserScore.dir/all:
+	$(MAKE) -f ros_game/CMakeFiles/_ros_game_generate_messages_check_deps_GetUserScore.dir/build.make ros_game/CMakeFiles/_ros_game_generate_messages_check_deps_GetUserScore.dir/depend
+	$(MAKE) -f ros_game/CMakeFiles/_ros_game_generate_messages_check_deps_GetUserScore.dir/build.make ros_game/CMakeFiles/_ros_game_generate_messages_check_deps_GetUserScore.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/aina/RP_Crespi_Campos_Perez_25/catkin_ws/build/CMakeFiles --progress-num= "Built target _ros_game_generate_messages_check_deps_GetUserScore"
+.PHONY : ros_game/CMakeFiles/_ros_game_generate_messages_check_deps_GetUserScore.dir/all
+
+# Build rule for subdir invocation for target.
+ros_game/CMakeFiles/_ros_game_generate_messages_check_deps_GetUserScore.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/aina/RP_Crespi_Campos_Perez_25/catkin_ws/build/CMakeFiles 0
+	$(MAKE) -f CMakeFiles/Makefile2 ros_game/CMakeFiles/_ros_game_generate_messages_check_deps_GetUserScore.dir/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/aina/RP_Crespi_Campos_Perez_25/catkin_ws/build/CMakeFiles 0
+.PHONY : ros_game/CMakeFiles/_ros_game_generate_messages_check_deps_GetUserScore.dir/rule
+
+# Convenience name for target.
+_ros_game_generate_messages_check_deps_GetUserScore: ros_game/CMakeFiles/_ros_game_generate_messages_check_deps_GetUserScore.dir/rule
+
+.PHONY : _ros_game_generate_messages_check_deps_GetUserScore
+
+# clean rule for target.
+ros_game/CMakeFiles/_ros_game_generate_messages_check_deps_GetUserScore.dir/clean:
+	$(MAKE) -f ros_game/CMakeFiles/_ros_game_generate_messages_check_deps_GetUserScore.dir/build.make ros_game/CMakeFiles/_ros_game_generate_messages_check_deps_GetUserScore.dir/clean
+.PHONY : ros_game/CMakeFiles/_ros_game_generate_messages_check_deps_GetUserScore.dir/clean
+
+#=============================================================================
+# Target rules for target ros_game/CMakeFiles/ros_game_geneus.dir
+
+# All Build rule for target.
+ros_game/CMakeFiles/ros_game_geneus.dir/all: ros_game/CMakeFiles/ros_game_generate_messages_eus.dir/all
+	$(MAKE) -f ros_game/CMakeFiles/ros_game_geneus.dir/build.make ros_game/CMakeFiles/ros_game_geneus.dir/depend
+	$(MAKE) -f ros_game/CMakeFiles/ros_game_geneus.dir/build.make ros_game/CMakeFiles/ros_game_geneus.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/aina/RP_Crespi_Campos_Perez_25/catkin_ws/build/CMakeFiles --progress-num= "Built target ros_game_geneus"
+.PHONY : ros_game/CMakeFiles/ros_game_geneus.dir/all
+
+# Build rule for subdir invocation for target.
+ros_game/CMakeFiles/ros_game_geneus.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/aina/RP_Crespi_Campos_Perez_25/catkin_ws/build/CMakeFiles 3
+	$(MAKE) -f CMakeFiles/Makefile2 ros_game/CMakeFiles/ros_game_geneus.dir/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/aina/RP_Crespi_Campos_Perez_25/catkin_ws/build/CMakeFiles 0
+.PHONY : ros_game/CMakeFiles/ros_game_geneus.dir/rule
+
+# Convenience name for target.
+ros_game_geneus: ros_game/CMakeFiles/ros_game_geneus.dir/rule
+
+.PHONY : ros_game_geneus
+
+# clean rule for target.
+ros_game/CMakeFiles/ros_game_geneus.dir/clean:
+	$(MAKE) -f ros_game/CMakeFiles/ros_game_geneus.dir/build.make ros_game/CMakeFiles/ros_game_geneus.dir/clean
+.PHONY : ros_game/CMakeFiles/ros_game_geneus.dir/clean
+
+#=============================================================================
+# Target rules for target ros_game/CMakeFiles/ros_game_generate_messages.dir
+
+# All Build rule for target.
+ros_game/CMakeFiles/ros_game_generate_messages.dir/all: ros_game/CMakeFiles/ros_game_generate_messages_cpp.dir/all
+ros_game/CMakeFiles/ros_game_generate_messages.dir/all: ros_game/CMakeFiles/ros_game_generate_messages_eus.dir/all
+ros_game/CMakeFiles/ros_game_generate_messages.dir/all: ros_game/CMakeFiles/ros_game_generate_messages_lisp.dir/all
+ros_game/CMakeFiles/ros_game_generate_messages.dir/all: ros_game/CMakeFiles/ros_game_generate_messages_nodejs.dir/all
+ros_game/CMakeFiles/ros_game_generate_messages.dir/all: ros_game/CMakeFiles/ros_game_generate_messages_py.dir/all
+	$(MAKE) -f ros_game/CMakeFiles/ros_game_generate_messages.dir/build.make ros_game/CMakeFiles/ros_game_generate_messages.dir/depend
+	$(MAKE) -f ros_game/CMakeFiles/ros_game_generate_messages.dir/build.make ros_game/CMakeFiles/ros_game_generate_messages.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/aina/RP_Crespi_Campos_Perez_25/catkin_ws/build/CMakeFiles --progress-num= "Built target ros_game_generate_messages"
+.PHONY : ros_game/CMakeFiles/ros_game_generate_messages.dir/all
+
+# Build rule for subdir invocation for target.
+ros_game/CMakeFiles/ros_game_generate_messages.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/aina/RP_Crespi_Campos_Perez_25/catkin_ws/build/CMakeFiles 12
+	$(MAKE) -f CMakeFiles/Makefile2 ros_game/CMakeFiles/ros_game_generate_messages.dir/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/aina/RP_Crespi_Campos_Perez_25/catkin_ws/build/CMakeFiles 0
+.PHONY : ros_game/CMakeFiles/ros_game_generate_messages.dir/rule
+
+# Convenience name for target.
+ros_game_generate_messages: ros_game/CMakeFiles/ros_game_generate_messages.dir/rule
+
+.PHONY : ros_game_generate_messages
+
+# clean rule for target.
+ros_game/CMakeFiles/ros_game_generate_messages.dir/clean:
+	$(MAKE) -f ros_game/CMakeFiles/ros_game_generate_messages.dir/build.make ros_game/CMakeFiles/ros_game_generate_messages.dir/clean
+.PHONY : ros_game/CMakeFiles/ros_game_generate_messages.dir/clean
+
+#=============================================================================
+# Target rules for target ros_game/CMakeFiles/ros_game_generate_messages_cpp.dir
+
+# All Build rule for target.
+ros_game/CMakeFiles/ros_game_generate_messages_cpp.dir/all: ros_game_msgs/CMakeFiles/std_msgs_generate_messages_cpp.dir/all
+ros_game/CMakeFiles/ros_game_generate_messages_cpp.dir/all: ros_game/CMakeFiles/_ros_game_generate_messages_check_deps_SetGameDifficulty.dir/all
+ros_game/CMakeFiles/ros_game_generate_messages_cpp.dir/all: ros_game/CMakeFiles/_ros_game_generate_messages_check_deps_GetUserScore.dir/all
+	$(MAKE) -f ros_game/CMakeFiles/ros_game_generate_messages_cpp.dir/build.make ros_game/CMakeFiles/ros_game_generate_messages_cpp.dir/depend
+	$(MAKE) -f ros_game/CMakeFiles/ros_game_generate_messages_cpp.dir/build.make ros_game/CMakeFiles/ros_game_generate_messages_cpp.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/aina/RP_Crespi_Campos_Perez_25/catkin_ws/build/CMakeFiles --progress-num=9,10 "Built target ros_game_generate_messages_cpp"
+.PHONY : ros_game/CMakeFiles/ros_game_generate_messages_cpp.dir/all
+
+# Build rule for subdir invocation for target.
+ros_game/CMakeFiles/ros_game_generate_messages_cpp.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/aina/RP_Crespi_Campos_Perez_25/catkin_ws/build/CMakeFiles 2
+	$(MAKE) -f CMakeFiles/Makefile2 ros_game/CMakeFiles/ros_game_generate_messages_cpp.dir/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/aina/RP_Crespi_Campos_Perez_25/catkin_ws/build/CMakeFiles 0
+.PHONY : ros_game/CMakeFiles/ros_game_generate_messages_cpp.dir/rule
+
+# Convenience name for target.
+ros_game_generate_messages_cpp: ros_game/CMakeFiles/ros_game_generate_messages_cpp.dir/rule
+
+.PHONY : ros_game_generate_messages_cpp
+
+# clean rule for target.
+ros_game/CMakeFiles/ros_game_generate_messages_cpp.dir/clean:
+	$(MAKE) -f ros_game/CMakeFiles/ros_game_generate_messages_cpp.dir/build.make ros_game/CMakeFiles/ros_game_generate_messages_cpp.dir/clean
+.PHONY : ros_game/CMakeFiles/ros_game_generate_messages_cpp.dir/clean
+
+#=============================================================================
+# Target rules for target ros_game/CMakeFiles/ros_game_gencpp.dir
+
+# All Build rule for target.
+ros_game/CMakeFiles/ros_game_gencpp.dir/all: ros_game/CMakeFiles/ros_game_generate_messages_cpp.dir/all
+	$(MAKE) -f ros_game/CMakeFiles/ros_game_gencpp.dir/build.make ros_game/CMakeFiles/ros_game_gencpp.dir/depend
+	$(MAKE) -f ros_game/CMakeFiles/ros_game_gencpp.dir/build.make ros_game/CMakeFiles/ros_game_gencpp.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/aina/RP_Crespi_Campos_Perez_25/catkin_ws/build/CMakeFiles --progress-num= "Built target ros_game_gencpp"
+.PHONY : ros_game/CMakeFiles/ros_game_gencpp.dir/all
+
+# Build rule for subdir invocation for target.
+ros_game/CMakeFiles/ros_game_gencpp.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/aina/RP_Crespi_Campos_Perez_25/catkin_ws/build/CMakeFiles 2
+	$(MAKE) -f CMakeFiles/Makefile2 ros_game/CMakeFiles/ros_game_gencpp.dir/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/aina/RP_Crespi_Campos_Perez_25/catkin_ws/build/CMakeFiles 0
+.PHONY : ros_game/CMakeFiles/ros_game_gencpp.dir/rule
+
+# Convenience name for target.
+ros_game_gencpp: ros_game/CMakeFiles/ros_game_gencpp.dir/rule
+
+.PHONY : ros_game_gencpp
+
+# clean rule for target.
+ros_game/CMakeFiles/ros_game_gencpp.dir/clean:
+	$(MAKE) -f ros_game/CMakeFiles/ros_game_gencpp.dir/build.make ros_game/CMakeFiles/ros_game_gencpp.dir/clean
+.PHONY : ros_game/CMakeFiles/ros_game_gencpp.dir/clean
+
+#=============================================================================
+# Target rules for target ros_game/CMakeFiles/ros_game_genlisp.dir
+
+# All Build rule for target.
+ros_game/CMakeFiles/ros_game_genlisp.dir/all: ros_game/CMakeFiles/ros_game_generate_messages_lisp.dir/all
+	$(MAKE) -f ros_game/CMakeFiles/ros_game_genlisp.dir/build.make ros_game/CMakeFiles/ros_game_genlisp.dir/depend
+	$(MAKE) -f ros_game/CMakeFiles/ros_game_genlisp.dir/build.make ros_game/CMakeFiles/ros_game_genlisp.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/aina/RP_Crespi_Campos_Perez_25/catkin_ws/build/CMakeFiles --progress-num= "Built target ros_game_genlisp"
+.PHONY : ros_game/CMakeFiles/ros_game_genlisp.dir/all
+
+# Build rule for subdir invocation for target.
+ros_game/CMakeFiles/ros_game_genlisp.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/aina/RP_Crespi_Campos_Perez_25/catkin_ws/build/CMakeFiles 2
+	$(MAKE) -f CMakeFiles/Makefile2 ros_game/CMakeFiles/ros_game_genlisp.dir/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/aina/RP_Crespi_Campos_Perez_25/catkin_ws/build/CMakeFiles 0
+.PHONY : ros_game/CMakeFiles/ros_game_genlisp.dir/rule
+
+# Convenience name for target.
+ros_game_genlisp: ros_game/CMakeFiles/ros_game_genlisp.dir/rule
+
+.PHONY : ros_game_genlisp
+
+# clean rule for target.
+ros_game/CMakeFiles/ros_game_genlisp.dir/clean:
+	$(MAKE) -f ros_game/CMakeFiles/ros_game_genlisp.dir/build.make ros_game/CMakeFiles/ros_game_genlisp.dir/clean
+.PHONY : ros_game/CMakeFiles/ros_game_genlisp.dir/clean
+
+#=============================================================================
+# Target rules for target ros_game/CMakeFiles/ros_game_gennodejs.dir
+
+# All Build rule for target.
+ros_game/CMakeFiles/ros_game_gennodejs.dir/all: ros_game/CMakeFiles/ros_game_generate_messages_nodejs.dir/all
+	$(MAKE) -f ros_game/CMakeFiles/ros_game_gennodejs.dir/build.make ros_game/CMakeFiles/ros_game_gennodejs.dir/depend
+	$(MAKE) -f ros_game/CMakeFiles/ros_game_gennodejs.dir/build.make ros_game/CMakeFiles/ros_game_gennodejs.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/aina/RP_Crespi_Campos_Perez_25/catkin_ws/build/CMakeFiles --progress-num= "Built target ros_game_gennodejs"
+.PHONY : ros_game/CMakeFiles/ros_game_gennodejs.dir/all
+
+# Build rule for subdir invocation for target.
+ros_game/CMakeFiles/ros_game_gennodejs.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/aina/RP_Crespi_Campos_Perez_25/catkin_ws/build/CMakeFiles 2
+	$(MAKE) -f CMakeFiles/Makefile2 ros_game/CMakeFiles/ros_game_gennodejs.dir/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/aina/RP_Crespi_Campos_Perez_25/catkin_ws/build/CMakeFiles 0
+.PHONY : ros_game/CMakeFiles/ros_game_gennodejs.dir/rule
+
+# Convenience name for target.
+ros_game_gennodejs: ros_game/CMakeFiles/ros_game_gennodejs.dir/rule
+
+.PHONY : ros_game_gennodejs
+
+# clean rule for target.
+ros_game/CMakeFiles/ros_game_gennodejs.dir/clean:
+	$(MAKE) -f ros_game/CMakeFiles/ros_game_gennodejs.dir/build.make ros_game/CMakeFiles/ros_game_gennodejs.dir/clean
+.PHONY : ros_game/CMakeFiles/ros_game_gennodejs.dir/clean
+
+#=============================================================================
+# Target rules for target ros_game/CMakeFiles/ros_game_generate_messages_eus.dir
+
+# All Build rule for target.
+ros_game/CMakeFiles/ros_game_generate_messages_eus.dir/all: ros_game_msgs/CMakeFiles/std_msgs_generate_messages_eus.dir/all
+ros_game/CMakeFiles/ros_game_generate_messages_eus.dir/all: ros_game/CMakeFiles/_ros_game_generate_messages_check_deps_SetGameDifficulty.dir/all
+ros_game/CMakeFiles/ros_game_generate_messages_eus.dir/all: ros_game/CMakeFiles/_ros_game_generate_messages_check_deps_GetUserScore.dir/all
+	$(MAKE) -f ros_game/CMakeFiles/ros_game_generate_messages_eus.dir/build.make ros_game/CMakeFiles/ros_game_generate_messages_eus.dir/depend
+	$(MAKE) -f ros_game/CMakeFiles/ros_game_generate_messages_eus.dir/build.make ros_game/CMakeFiles/ros_game_generate_messages_eus.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/aina/RP_Crespi_Campos_Perez_25/catkin_ws/build/CMakeFiles --progress-num=11,12,13 "Built target ros_game_generate_messages_eus"
+.PHONY : ros_game/CMakeFiles/ros_game_generate_messages_eus.dir/all
+
+# Build rule for subdir invocation for target.
+ros_game/CMakeFiles/ros_game_generate_messages_eus.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/aina/RP_Crespi_Campos_Perez_25/catkin_ws/build/CMakeFiles 3
+	$(MAKE) -f CMakeFiles/Makefile2 ros_game/CMakeFiles/ros_game_generate_messages_eus.dir/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/aina/RP_Crespi_Campos_Perez_25/catkin_ws/build/CMakeFiles 0
+.PHONY : ros_game/CMakeFiles/ros_game_generate_messages_eus.dir/rule
+
+# Convenience name for target.
+ros_game_generate_messages_eus: ros_game/CMakeFiles/ros_game_generate_messages_eus.dir/rule
+
+.PHONY : ros_game_generate_messages_eus
+
+# clean rule for target.
+ros_game/CMakeFiles/ros_game_generate_messages_eus.dir/clean:
+	$(MAKE) -f ros_game/CMakeFiles/ros_game_generate_messages_eus.dir/build.make ros_game/CMakeFiles/ros_game_generate_messages_eus.dir/clean
+.PHONY : ros_game/CMakeFiles/ros_game_generate_messages_eus.dir/clean
+
+#=============================================================================
+# Target rules for target ros_game/CMakeFiles/ros_game_generate_messages_lisp.dir
+
+# All Build rule for target.
+ros_game/CMakeFiles/ros_game_generate_messages_lisp.dir/all: ros_game_msgs/CMakeFiles/std_msgs_generate_messages_lisp.dir/all
+ros_game/CMakeFiles/ros_game_generate_messages_lisp.dir/all: ros_game/CMakeFiles/_ros_game_generate_messages_check_deps_SetGameDifficulty.dir/all
+ros_game/CMakeFiles/ros_game_generate_messages_lisp.dir/all: ros_game/CMakeFiles/_ros_game_generate_messages_check_deps_GetUserScore.dir/all
+	$(MAKE) -f ros_game/CMakeFiles/ros_game_generate_messages_lisp.dir/build.make ros_game/CMakeFiles/ros_game_generate_messages_lisp.dir/depend
+	$(MAKE) -f ros_game/CMakeFiles/ros_game_generate_messages_lisp.dir/build.make ros_game/CMakeFiles/ros_game_generate_messages_lisp.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/aina/RP_Crespi_Campos_Perez_25/catkin_ws/build/CMakeFiles --progress-num=14,15 "Built target ros_game_generate_messages_lisp"
+.PHONY : ros_game/CMakeFiles/ros_game_generate_messages_lisp.dir/all
+
+# Build rule for subdir invocation for target.
+ros_game/CMakeFiles/ros_game_generate_messages_lisp.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/aina/RP_Crespi_Campos_Perez_25/catkin_ws/build/CMakeFiles 2
+	$(MAKE) -f CMakeFiles/Makefile2 ros_game/CMakeFiles/ros_game_generate_messages_lisp.dir/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/aina/RP_Crespi_Campos_Perez_25/catkin_ws/build/CMakeFiles 0
+.PHONY : ros_game/CMakeFiles/ros_game_generate_messages_lisp.dir/rule
+
+# Convenience name for target.
+ros_game_generate_messages_lisp: ros_game/CMakeFiles/ros_game_generate_messages_lisp.dir/rule
+
+.PHONY : ros_game_generate_messages_lisp
+
+# clean rule for target.
+ros_game/CMakeFiles/ros_game_generate_messages_lisp.dir/clean:
+	$(MAKE) -f ros_game/CMakeFiles/ros_game_generate_messages_lisp.dir/build.make ros_game/CMakeFiles/ros_game_generate_messages_lisp.dir/clean
+.PHONY : ros_game/CMakeFiles/ros_game_generate_messages_lisp.dir/clean
+
+#=============================================================================
+# Target rules for target ros_game/CMakeFiles/ros_game_generate_messages_nodejs.dir
+
+# All Build rule for target.
+ros_game/CMakeFiles/ros_game_generate_messages_nodejs.dir/all: ros_game_msgs/CMakeFiles/std_msgs_generate_messages_nodejs.dir/all
+ros_game/CMakeFiles/ros_game_generate_messages_nodejs.dir/all: ros_game/CMakeFiles/_ros_game_generate_messages_check_deps_SetGameDifficulty.dir/all
+ros_game/CMakeFiles/ros_game_generate_messages_nodejs.dir/all: ros_game/CMakeFiles/_ros_game_generate_messages_check_deps_GetUserScore.dir/all
+	$(MAKE) -f ros_game/CMakeFiles/ros_game_generate_messages_nodejs.dir/build.make ros_game/CMakeFiles/ros_game_generate_messages_nodejs.dir/depend
+	$(MAKE) -f ros_game/CMakeFiles/ros_game_generate_messages_nodejs.dir/build.make ros_game/CMakeFiles/ros_game_generate_messages_nodejs.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/aina/RP_Crespi_Campos_Perez_25/catkin_ws/build/CMakeFiles --progress-num=16,17 "Built target ros_game_generate_messages_nodejs"
+.PHONY : ros_game/CMakeFiles/ros_game_generate_messages_nodejs.dir/all
+
+# Build rule for subdir invocation for target.
+ros_game/CMakeFiles/ros_game_generate_messages_nodejs.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/aina/RP_Crespi_Campos_Perez_25/catkin_ws/build/CMakeFiles 2
+	$(MAKE) -f CMakeFiles/Makefile2 ros_game/CMakeFiles/ros_game_generate_messages_nodejs.dir/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/aina/RP_Crespi_Campos_Perez_25/catkin_ws/build/CMakeFiles 0
+.PHONY : ros_game/CMakeFiles/ros_game_generate_messages_nodejs.dir/rule
+
+# Convenience name for target.
+ros_game_generate_messages_nodejs: ros_game/CMakeFiles/ros_game_generate_messages_nodejs.dir/rule
+
+.PHONY : ros_game_generate_messages_nodejs
+
+# clean rule for target.
+ros_game/CMakeFiles/ros_game_generate_messages_nodejs.dir/clean:
+	$(MAKE) -f ros_game/CMakeFiles/ros_game_generate_messages_nodejs.dir/build.make ros_game/CMakeFiles/ros_game_generate_messages_nodejs.dir/clean
+.PHONY : ros_game/CMakeFiles/ros_game_generate_messages_nodejs.dir/clean
+
+#=============================================================================
+# Target rules for target ros_game/CMakeFiles/ros_game_generate_messages_py.dir
+
+# All Build rule for target.
+ros_game/CMakeFiles/ros_game_generate_messages_py.dir/all: ros_game_msgs/CMakeFiles/std_msgs_generate_messages_py.dir/all
+ros_game/CMakeFiles/ros_game_generate_messages_py.dir/all: ros_game/CMakeFiles/_ros_game_generate_messages_check_deps_SetGameDifficulty.dir/all
+ros_game/CMakeFiles/ros_game_generate_messages_py.dir/all: ros_game/CMakeFiles/_ros_game_generate_messages_check_deps_GetUserScore.dir/all
+	$(MAKE) -f ros_game/CMakeFiles/ros_game_generate_messages_py.dir/build.make ros_game/CMakeFiles/ros_game_generate_messages_py.dir/depend
+	$(MAKE) -f ros_game/CMakeFiles/ros_game_generate_messages_py.dir/build.make ros_game/CMakeFiles/ros_game_generate_messages_py.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/aina/RP_Crespi_Campos_Perez_25/catkin_ws/build/CMakeFiles --progress-num=18,19,20 "Built target ros_game_generate_messages_py"
+.PHONY : ros_game/CMakeFiles/ros_game_generate_messages_py.dir/all
+
+# Build rule for subdir invocation for target.
+ros_game/CMakeFiles/ros_game_generate_messages_py.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/aina/RP_Crespi_Campos_Perez_25/catkin_ws/build/CMakeFiles 3
+	$(MAKE) -f CMakeFiles/Makefile2 ros_game/CMakeFiles/ros_game_generate_messages_py.dir/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/aina/RP_Crespi_Campos_Perez_25/catkin_ws/build/CMakeFiles 0
+.PHONY : ros_game/CMakeFiles/ros_game_generate_messages_py.dir/rule
+
+# Convenience name for target.
+ros_game_generate_messages_py: ros_game/CMakeFiles/ros_game_generate_messages_py.dir/rule
+
+.PHONY : ros_game_generate_messages_py
+
+# clean rule for target.
+ros_game/CMakeFiles/ros_game_generate_messages_py.dir/clean:
+	$(MAKE) -f ros_game/CMakeFiles/ros_game_generate_messages_py.dir/build.make ros_game/CMakeFiles/ros_game_generate_messages_py.dir/clean
+.PHONY : ros_game/CMakeFiles/ros_game_generate_messages_py.dir/clean
+
+#=============================================================================
+# Target rules for target ros_game/CMakeFiles/ros_game_genpy.dir
+
+# All Build rule for target.
+ros_game/CMakeFiles/ros_game_genpy.dir/all: ros_game/CMakeFiles/ros_game_generate_messages_py.dir/all
+	$(MAKE) -f ros_game/CMakeFiles/ros_game_genpy.dir/build.make ros_game/CMakeFiles/ros_game_genpy.dir/depend
+	$(MAKE) -f ros_game/CMakeFiles/ros_game_genpy.dir/build.make ros_game/CMakeFiles/ros_game_genpy.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/aina/RP_Crespi_Campos_Perez_25/catkin_ws/build/CMakeFiles --progress-num= "Built target ros_game_genpy"
+.PHONY : ros_game/CMakeFiles/ros_game_genpy.dir/all
+
+# Build rule for subdir invocation for target.
+ros_game/CMakeFiles/ros_game_genpy.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/aina/RP_Crespi_Campos_Perez_25/catkin_ws/build/CMakeFiles 3
+	$(MAKE) -f CMakeFiles/Makefile2 ros_game/CMakeFiles/ros_game_genpy.dir/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/aina/RP_Crespi_Campos_Perez_25/catkin_ws/build/CMakeFiles 0
+.PHONY : ros_game/CMakeFiles/ros_game_genpy.dir/rule
+
+# Convenience name for target.
+ros_game_genpy: ros_game/CMakeFiles/ros_game_genpy.dir/rule
+
+.PHONY : ros_game_genpy
+
+# clean rule for target.
+ros_game/CMakeFiles/ros_game_genpy.dir/clean:
+	$(MAKE) -f ros_game/CMakeFiles/ros_game_genpy.dir/build.make ros_game/CMakeFiles/ros_game_genpy.dir/clean
+.PHONY : ros_game/CMakeFiles/ros_game_genpy.dir/clean
 
 #=============================================================================
 # Special targets to cleanup operation of make.

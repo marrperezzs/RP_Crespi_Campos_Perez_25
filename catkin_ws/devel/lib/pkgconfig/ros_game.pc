@@ -3,6 +3,6 @@ prefix=/home/aina/RP_Crespi_Campos_Perez_25/catkin_ws/devel
 Name: ros_game
 Description: Description of ros_game
 Version: 0.0.0
-Cflags: 
+Cflags: -I/home/aina/RP_Crespi_Campos_Perez_25/catkin_ws/devel/include
 Libs: -L${prefix}/lib 
-Requires: 
+Requires: rospy std_msgs message_runtime

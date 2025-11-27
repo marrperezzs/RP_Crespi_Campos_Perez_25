@@ -855,8 +855,8 @@ class Game:
             # Solo actuamos en la fase de juego
             return
 
-        if self.last_command is None:
-            return
+        #if self.last_command is None:
+            #return
 
         cmd = self.last_command
         self.last_command = None  # consumimos el comando
@@ -1249,11 +1249,24 @@ class Game:
         rospy.loginfo("GAME_NODE: Received keyboard command: %s", self.last_command)
 
     def handle_user_score(self, req: GetUserScore) -> GetUserScoreResponse:
-        """Servicio para obtener el score del usuario."""
-        response = GetUserScoreResponse()
-        response.score = self.score
-        rospy.loginfo("GAME_NODE: User score requested, current score: %d", self.score)
-        return response
+        """
+        Servicio 'user_score':
+        - req.name: nombre del usuario
+        - devuelve: porcentaje de su score (por ahora, ejemplo simple)
+        """
+        name = req.username
+        score = self.user_scores.get(name, 0)
+
+        # Ejemplo: porcentaje respecto maximo de puntos hechos
+        max_points = self.load_high_score()
+        percentage = 100.0 * float(score) / max_points
+        if percentage > 100.0:
+            percentage = 100.0
+
+        rospy.loginfo("SERVICE user_score: name=%s, score=%d, percentage=%.2f",
+                      name, score, percentage)
+
+        return GetUserScoreResponse(percentage=percentage)
 
     def handle_set_difficulty(self, req: SetGameDifficulty) -> SetGameDifficultyResponse:
         """

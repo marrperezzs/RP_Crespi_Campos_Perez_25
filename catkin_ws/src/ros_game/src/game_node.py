@@ -96,12 +96,13 @@ class GameState(Enum):
 class Player:
     """Player class representing the purple square character"""
     
-    def __init__(self, x: int, y: int):
+    def __init__(self, x: int, y: int, color=PURPLE):
         self.rect = pygame.Rect(x, y, PLAYER_SIZE, PLAYER_SIZE)
         self.velocity_y = 0
         self.on_ground = False
         self.jump_count = 0
         self.max_jumps = 2  # Double jump enabled
+        self.color = color
         
     def update(self, dt: float, fast_fall: bool = False, platforms: List['Obstacle'] = None):
         """Update player physics"""
@@ -188,11 +189,17 @@ class Player:
             
     def draw(self, surface: pygame.Surface):
         """Draw the player"""
-        pygame.draw.rect(surface, PURPLE, self.rect)
+        pygame.draw.rect(surface, self.color, self.rect)
+
         # Add a small highlight for visual appeal
         highlight = pygame.Rect(self.rect.x + 2, self.rect.y + 2, 
                                self.rect.width - 4, self.rect.height - 4)
-        pygame.draw.rect(surface, (200, 100, 255), highlight)
+
+        # Highlight un poco más claro que el color base
+        hr = min(255, self.color[0] + 80)
+        hg = min(255, self.color[1] + 80)
+        hb = min(255, self.color[2] + 80)
+        pygame.draw.rect(surface, (hr, hg, hb), highlight)                    
         
         # Draw smiley face
         center_x = self.rect.centerx
@@ -443,6 +450,14 @@ class Game:
         self.user_name = ""
         self.user_username = ""
         self.user_age = 0
+
+        rospy.set_param('user_name', self.user_name)
+
+        if not rospy.has_param("change_player_color"):
+            rospy.set_param("change_player_color", 2)  # morado por defecto
+        self.player_color = PURPLE
+        
+        rospy.set_param("screen_param", "phase1")
 
         self.last_command: Optional[str] = None
 
@@ -730,7 +745,9 @@ class Game:
         
     def reset_game(self):
         """Reset game to initial state"""
-        self.player = Player(100, SCREEN_HEIGHT - 50 - PLAYER_SIZE)
+        # Actualizamos el color según el parámetro ANTES de crear el jugador
+        self.update_player_color_from_param()
+        self.player = Player(100, SCREEN_HEIGHT - 50 - PLAYER_SIZE, self.player_color)
         self.obstacles: List[Obstacle] = []
         self.spawner = Spawner()
         self.score = 0
@@ -738,8 +755,9 @@ class Game:
         self.scroll_speed = BASE_SPEED
         self.last_milestone = 0
         # Reset background to default colors
-        self.background.change_colors(LIGHT_BLUE, DARK_BLUE)
-        
+        self.background.change_colors(LIGHT_BLUE, DARK_BLUE)    
+
+
     def load_high_score(self) -> int:
         """Load high score from file"""
         try:
@@ -880,6 +898,8 @@ class Game:
         if self.state != GameState.PLAYING:
             return
             
+        self.update_player_color_from_param()
+
         current_time = pygame.time.get_ticks() / 1000.0
         game_time = current_time - self.game_start_time
         
@@ -1004,7 +1024,7 @@ class Game:
         
         if self.user_name:
             name_text = self.font.render(f"PLAYER: {self.user_name}", True, NEON_GREEN)
-            self.screen.blit(name_text, name_text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 - 60)))
+            self.screen.blit(name_text, name_text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 - 200)))
 
         # Start prompt with pulsing neon
         pulse2 = int(127 + 127 * math.sin(pygame.time.get_ticks() * 0.005))
@@ -1139,6 +1159,8 @@ class Game:
         
     def draw(self):
         """Draw the current game state"""
+        self.update_screen_param()
+
         if self.state == GameState.MENU:
             self.draw_menu()
         elif self.state == GameState.GAME_OVER:
@@ -1246,6 +1268,9 @@ class Game:
         self.user_name = msg.name
         self.user_username = msg.username
         self.user_age = msg.age
+
+        rospy.set_param('user_name', self.user_name)
+
         rospy.loginfo(
             "GAME_NODE: Received user info: name=%s, username=%s, age=%d",
             self.user_name, self.user_username, self.user_age
@@ -1264,14 +1289,13 @@ class Game:
         """
         name = req.username
 
-        # Score del usuario (0 si nunca ha jugado o nunca ha muerto)
-        score = self.user_scores.get(name, 0)
+        # Score del usuario
+        score = self.score
 
         # Máximo score de todos los usuarios registrados
-        if self.user_scores:
-            max_score = max(self.user_scores.values())
-        else:
-            max_score = 0
+        
+        max_score = self.load_high_score()
+      
 
         if max_score <= 0:
             percentage = 0.0
@@ -1322,6 +1346,33 @@ class Game:
             # Por si acaso llega algo raro
             self.speed_multiplier = 1.0
 
+    def update_player_color_from_param(self):
+        """Lee el parámetro change_player_color y ajusta el color del jugador."""
+        code = rospy.get_param("change_player_color", 2)
+
+        if code == 1:
+            self.player_color = RED
+        elif code == 3:
+            self.player_color = BLUE
+        else:
+            self.player_color = PURPLE
+
+        # Si ya existe el jugador, actualizamos su color
+        if hasattr(self, "player") and self.player is not None:
+            self.player.color = self.player_color
+
+    def update_screen_param(self):
+        """Actualiza el parámetro screen_param según el estado del juego."""
+        if self.state == GameState.MENU:
+            phase = "phase1"
+        elif self.state == GameState.PLAYING:
+            phase = "phase2"
+        elif self.state == GameState.GAME_OVER:
+            phase = "phase3"
+        else:
+            phase = "unknown"
+
+        rospy.set_param("screen_param", phase)
 
     def run(self):
         """Bucle principal del nodo GAME_NODE organizado en 3 fases."""

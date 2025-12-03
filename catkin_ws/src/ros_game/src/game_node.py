@@ -444,7 +444,7 @@ class Game:
         self.user_username = ""
         self.user_age = 0
 
-        self.last_comand: Optional[str] = None
+        self.last_command: Optional[str] = None
 
         self.user_sub = rospy.Subscriber('/user_information', user_msg, self.user_info_callback)
         self.key_sub = rospy.Subscriber('/keyboard_control', String, self.key_callback) 
@@ -855,8 +855,8 @@ class Game:
             # Solo actuamos en la fase de juego
             return
 
-        #if self.last_command is None:
-            #return
+        if self.last_command is None:
+            return
 
         cmd = self.last_command
         self.last_command = None  # consumimos el comando
@@ -905,6 +905,10 @@ class Game:
                 self.high_score = self.score
                 self.save_high_score()
 
+
+            if self.user_name:
+                self.user_scores[self.user_name] = self.score
+
             self.result_pub.publish(Int64(self.score))
             rospy.loginfo(f"Game Over! Final Score: {self.score}")
             return
@@ -940,6 +944,10 @@ class Game:
                 if self.score > self.high_score:
                     self.high_score = self.score
                     self.save_high_score()
+
+
+                if self.user_name:
+                    self.user_scores[self.user_name] = self.score
 
                 self.result_pub.publish(Int64(self.score))
                 rospy.loginfo(f"Game Over! Final Score: {self.score}")
@@ -1252,21 +1260,30 @@ class Game:
         """
         Servicio 'user_score':
         - req.name: nombre del usuario
-        - devuelve: porcentaje de su score (por ahora, ejemplo simple)
+        - devuelve: porcentaje de su score respecto al máximo registrado.
         """
         name = req.username
+
+        # Score del usuario (0 si nunca ha jugado o nunca ha muerto)
         score = self.user_scores.get(name, 0)
 
-        # Ejemplo: porcentaje respecto maximo de puntos hechos
-        max_points = self.load_high_score()
-        percentage = 100.0 * float(score) / max_points
-        if percentage > 100.0:
-            percentage = 100.0
+        # Máximo score de todos los usuarios registrados
+        if self.user_scores:
+            max_score = max(self.user_scores.values())
+        else:
+            max_score = 0
 
-        rospy.loginfo("SERVICE user_score: name=%s, score=%d, percentage=%.2f",
-                      name, score, percentage)
+        if max_score <= 0:
+            percentage = 0.0
+        else:
+            percentage = 100.0 * float(score) / float(max_score)
 
-        return GetUserScoreResponse(percentage=percentage)
+        rospy.loginfo(
+            "SERVICE user_score: name=%s, score=%d, percentage=%.2f",
+            name, score, percentage
+        )
+
+        return GetUserScoreResponse(score=int(percentage))
 
     def handle_set_difficulty(self, req: SetGameDifficulty) -> SetGameDifficultyResponse:
         """

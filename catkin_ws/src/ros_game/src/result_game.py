@@ -11,18 +11,18 @@ class ResultNode:
         # Create a subscriber to receive user information
         self.sub = rospy.Subscriber('/user_information', user_msg, self.user_info_callback)
         self.sub = rospy.Subscriber('/result_information', Int64, self.result_info_callback)
-        rospy.loginfo("ResultNode initialized, waiting for user info...")
+        rospy.loginfo("[RESULT NODE] initialized, waiting for user info...")
 
     def user_info_callback(self, msg):
         # Log the received user information
-        rospy.loginfo("Received user information: Name: %s, Username: %s, Age: %d", msg.name, msg.username, msg.age)
+        rospy.loginfo("[RESULT NODE] Received user information: Name: %s, Username: %s, Age: %d", msg.name, msg.username, msg.age)
 
         # Store in variable
         self.user_username = msg.username
 
     def result_info_callback(self, msg):
         # Show username and result
-        rospy.loginfo("User: %s, Result: %d", self.user_username, msg.data)
+        rospy.loginfo("[RESULT NODE] User: %s, Result: %d", self.user_username, msg.data)
         
 if __name__ == '__main__':
     try:

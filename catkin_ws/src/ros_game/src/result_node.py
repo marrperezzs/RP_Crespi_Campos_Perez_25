@@ -9,53 +9,54 @@ class ResultNode:
     def __init__(self):
         rospy.init_node("result_node_s", anonymous=False)
 
-        self.user_info = None       # guardará el user_msg
-        self.final_score = None     # guardará el Int64 del resultado
+        self.user_info = None       # for the user_msg
+        self.final_score = None     # for the Int64 result
 
-        # Suscriptores
+        # Subscribers
         rospy.Subscriber("user_information", user_msg, self.user_callback)
         rospy.Subscriber("result_information", Int64, self.score_callback)
 
-        # Cliente del servicio user_score
-        rospy.loginfo("RESULT_NODE: esperando al servicio 'user_score'...")
+        # Service client for user_score
+        rospy.loginfo("[RESULT_NODE] waiting for 'user_score' service...")
         rospy.wait_for_service("user_score")
+
         self.user_score_client = rospy.ServiceProxy("user_score", GetUserScore)
-        rospy.loginfo("RESULT_NODE: conectado al servicio 'user_score'.")
+        rospy.loginfo("[RESULT_NODE] connected to 'user_score' service.")
 
     def user_callback(self, msg: user_msg):
         self.user_info = msg
-        rospy.loginfo("RESULT_NODE: recibido user_information: %s (%s)",
+        rospy.loginfo("[RESULT_NODE] received user_information: %s (%s)",
                       msg.name, msg.username)
         self.maybe_print_result()
 
     def score_callback(self, msg: Int64):
         self.final_score = msg.data
-        rospy.loginfo("RESULT_NODE: recibido result_information: %d", self.final_score)
+        rospy.loginfo("[RESULT_NODE] received result_information: %d", self.final_score)
         self.maybe_print_result()
 
     def maybe_print_result(self):
-        """Cuando tengamos usuario y score, llamamos al servicio y mostramos porcentaje."""
+        """When we have both user and score, call the service and display percentage."""
         if self.user_info is None or self.final_score is None:
             return
 
-        # Preparar request al servicio
+        # Prepare request to the service
         req = GetUserScoreRequest()
         req.username = self.user_info.username
 
         try:
             resp = self.user_score_client(req)
         except rospy.ServiceException as e:
-            rospy.logerr("RESULT_NODE: llamada a user_score falló: %s", e)
+            rospy.logerr("[RESULT_NODE] call to user_score failed: %s", e)
             return
 
         percentage = resp.score
 
         rospy.loginfo(
-            "RESULT_NODE: Player %s scored %d points (%.2f%%)",
+            "[RESULT_NODE] Player %s scored %d points (%.2f%%)",
             self.user_info.username, self.final_score, percentage
         )
 
-        # Mensaje bonito por terminal
+        # Nice message for the terminal
         print("\n====================================")
         print(" Player {} ({})".format(self.user_info.username, self.user_info.name))
         print(" Score: {} points ({:.2f} %)".format(self.final_score, percentage))

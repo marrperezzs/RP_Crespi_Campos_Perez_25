@@ -11,12 +11,12 @@ class ControlNode:
         rospy.loginfo("ControlNode initialized (pygame), publishing to /keyboard_control")
 
         pygame.init()
-        # Ventana pequeña para que pygame reciba foco y capture teclas
+        # small window just to capture key events
         self.screen = pygame.display.set_mode((320, 120))
         pygame.display.set_caption("ROS Control Node (Arrow Keys)")
         self.clock = pygame.time.Clock()
 
-        # Para evitar spamear el mismo comando cada frame
+        # To avoid spamming the same command every frame
         self.last_sent = None
 
     def publish_cmd(self, cmd: str):
@@ -49,20 +49,8 @@ class ControlNode:
                     elif event.key == pygame.K_q or event.key == pygame.K_ESCAPE:
                         running = False
 
-            # Teclas mantenidas (movimiento continuo izq/der)
-            keys = pygame.key.get_pressed()
-            held = None
-            if keys[pygame.K_LEFT]:
-                held = "LEFT"
-            elif keys[pygame.K_RIGHT]:
-                held = "RIGHT"
 
-            if held:
-                self.publish_cmd(held)
-            else:
-                self.last_sent = None  # libera para permitir publicar otra vez al re-pulsar
-
-            # Dibujito mínimo (opcional)
+            # Clear screen (necessary for pygame event loop)
             self.screen.fill((20, 20, 20))
             pygame.display.flip()
 

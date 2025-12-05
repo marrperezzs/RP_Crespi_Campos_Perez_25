@@ -47,7 +47,7 @@ GRAY = (128, 128, 128)
 DARK_GRAY = (64, 64, 64)
 LIGHT_BLUE = (135, 206, 235)
 DARK_BLUE = (25, 25, 112)
-PLATFORM_COLOR = (139, 69, 19)  # Brown for platforms
+PLATFORM_COLOR = (139, 69, 19)  
 YELLOW = (255, 255, 0)
 
 # Background milestone colors
@@ -195,7 +195,7 @@ class Player:
         highlight = pygame.Rect(self.rect.x + 2, self.rect.y + 2, 
                                self.rect.width - 4, self.rect.height - 4)
 
-        # Highlight un poco más claro que el color base
+        # Highlight a more light colour 
         hr = min(255, self.color[0] + 80)
         hg = min(255, self.color[1] + 80)
         hb = min(255, self.color[2] + 80)
@@ -454,7 +454,7 @@ class Game:
         rospy.set_param('user_name', self.user_name)
 
         if not rospy.has_param("change_player_color"):
-            rospy.set_param("change_player_color", 2)  # morado por defecto
+            rospy.set_param("change_player_color", 2)  # Default purple
         self.player_color = PURPLE
         
         rospy.set_param("screen_param", "phase1")
@@ -465,7 +465,7 @@ class Game:
         self.key_sub = rospy.Subscriber('/keyboard_control', String, self.key_callback) 
         self.result_pub = rospy.Publisher('/result_information', Int64, queue_size=10)
 
-        rospy.loginfo("Game initialized, waiting for user info...")
+        rospy.loginfo("[GAME NODE] Game initialized, waiting for user info...")
 
         self.user_scores = {}
         self.current_difficulty = "medium"
@@ -745,7 +745,7 @@ class Game:
         
     def reset_game(self):
         """Reset game to initial state"""
-        # Actualizamos el color según el parámetro ANTES de crear el jugador
+        # Update player color from ROS param
         self.update_player_color_from_param()
         self.player = Player(100, SCREEN_HEIGHT - 50 - PLAYER_SIZE, self.player_color)
         self.obstacles: List[Obstacle] = []
@@ -754,6 +754,7 @@ class Game:
         self.game_start_time = 0
         self.scroll_speed = BASE_SPEED
         self.last_milestone = 0
+
         # Reset background to default colors
         self.background.change_colors(LIGHT_BLUE, DARK_BLUE)    
 
@@ -868,28 +869,28 @@ class Game:
         return True
 
     def apply_ros_command(self):
-        """Aplica el último comando recibido por ROS al jugador."""
+        """Apply the last received ROS command to the player"""
         if self.state != GameState.PLAYING:
-            # Solo actuamos en la fase de juego
+            # Only act during the playing phase
             return
 
         if self.last_command is None:
             return
 
         cmd = self.last_command
-        self.last_command = None  # consumimos el comando
+        self.last_command = None  # consume the command
 
         if cmd == "JUMP" or cmd == "UP":
             self.player.jump()
         elif cmd == "DOWN":
-            # Podrías activar una caída rápida extra si quieres
-            # Por ejemplo, aumentar momentáneamente la velocidad hacia abajo:
+            # You could activate an extra fast fall if you want
+            # For example, temporarily increase downward velocity:
             self.player.velocity_y += 200
         elif cmd == "LEFT":
-            # Pequeño movimiento horizontal a la izquierda
+            # Small horizontal movement to the left (not really used in normal gameplay)
             self.player.rect.x -= 15
         elif cmd == "RIGHT":
-            # Pequeño movimiento horizontal a la derecha
+            # Small horizontal movement to the right (not really used in normal gameplay)
             self.player.rect.x += 15
 
 
@@ -930,7 +931,7 @@ class Game:
                 self.user_scores[self.user_name] = self.score
 
             self.result_pub.publish(Int64(self.score))
-            rospy.loginfo(f"Game Over! Final Score: {self.score}")
+            rospy.loginfo(f"[GAME NODE] Game Over! Final Score: {self.score}")
             return
         
         # Spawn obstacles
@@ -1186,9 +1187,8 @@ class Game:
         pygame.display.flip()
         
     def welcome_phase(self) -> bool:
-        """Fase 1: Welcome - mostrar pantalla de menú y esperar a empezar el juego."""
+        """Phase 1: Welcome - show menu screen and wait to start the game."""
         rospy.loginfo("[GAME_NODE] Welcome phase started.")
-        # Aquí más adelante leerás el user_msg de ROS y mostrarás el nombre
 
         self.state = GameState.MENU
         running = True
@@ -1196,25 +1196,25 @@ class Game:
         while running and self.state == GameState.MENU:
             dt = self.clock.tick(FPS) / 1000.0
 
-            # Eventos (ESC para salir, cualquier tecla para empezar)
+            # Events (ESC to exit, any key to start)
             running = self.handle_events()
             if not running:
                 break
 
-            # En MENU, update() realmente no hace nada (sale tempranamente)
+            # In MENU, update() really does nothing (exits early)
             self.update(dt)
             self.draw()
 
-            # Cuando en handle_events se pulse una tecla, pasas a PLAYING
-            # y este while terminará porque self.state ya no será MENU
+            # When a key is pressed in handle_events, you switch to PLAYING
+            # and this while loop will end because self.state will no longer be MENU
 
         return running
 
     def game_phase(self) -> bool:
-        """Fase 2: Game - juego en marcha, controlado por las teclas (luego ROS)."""
+        """Phase 2: Game - game in progress, controlled by ROS."""
         rospy.loginfo("[GAME_NODE] Game phase started.")
 
-        # Aseguramos que el estado es PLAYING
+        # Ensure the state is PLAYING
         self.state = GameState.PLAYING
         running = True
 
@@ -1225,23 +1225,21 @@ class Game:
             if not running:
                 break
 
-            self.apply_ros_command()  # Aplica comandos recibidos por ROS
+            self.apply_ros_command()  # Apply commands received from ROS
 
 
-            self.update(dt)   # Física, colisiones, score, etc.
-            self.draw()       # Fondo, jugador, obstáculos, HUD...
-
-            # Cuando el jugador muere, en update() pasas a GAME_OVER,
-            # así que el while terminará porque self.state != PLAYING
+            self.update(dt)   # Physics, collisions, score, etc.
+            self.draw()       # Background, player, obstacles, HUD...
+            # When the player dies, in update() you switch to GAME_OVER,
+            # so the while loop will end because self.state != PLAYING
 
         return running
 
     def final_phase(self) -> bool:
-        """Fase 3: Final - mostrar pantalla de GAME OVER y calcular/publicar score."""
+        """Phase 3: Final - show GAME OVER screen and calculate/publish score."""
         rospy.loginfo("[GAME_NODE] Final phase reached, calculating score.")
-        # Aquí más adelante publicarás el score por ROS en 'result_information'
-
-        # Aseguramos que estamos en GAME_OVER
+    
+        # Ensure we are in GAME_OVER
         self.state = GameState.GAME_OVER
         running = True
 
@@ -1252,19 +1250,18 @@ class Game:
             if not running:
                 break
 
-            # En GAME_OVER no actualizas la lógica del juego, solo dibujas la pantalla final
+            # In GAME_OVER only draw the final screen
             self.draw()
 
-            # Si en GAME_OVER el jugador pulsa R, tu handle_events ya pone:
+            # If in GAME_OVER the player presses R, your handle_events already does:
             #   reset_game()
             #   self.state = GameState.PLAYING
-            # Esto hará que el while termine porque el estado deja de ser GAME_OVER.
+            # This will cause the while loop to end because the state is no longer GAME_OVER.
 
-        # Aquí es un buen sitio para hacer algo con self.score si lo necesitas
         return running
 
     def user_info_callback(self, msg: user_msg):
-        """Recibe name, username y age desde INFO_USER."""
+        """Receives name, username, and age from INFO_USER."""
         self.user_name = msg.name
         self.user_username = msg.username
         self.user_age = msg.age
@@ -1277,22 +1274,22 @@ class Game:
         )
 
     def key_callback(self, msg: String):
-        """Recibe comandos de movimiento desde CONTROL_NODE."""
+        """Receives movement commands from CONTROL_NODE."""
         self.last_command = msg.data.upper()
         rospy.loginfo("GAME_NODE: Received keyboard command: %s", self.last_command)
 
     def handle_user_score(self, req: GetUserScore) -> GetUserScoreResponse:
         """
-        Servicio 'user_score':
-        - req.name: nombre del usuario
-        - devuelve: porcentaje de su score respecto al máximo registrado.
+        Service 'user_score':
+        - req.name: user name
+        - returns: percentage of their score relative to the maximum recorded.
         """
         name = req.username
 
-        # Score del usuario
+        # User score
         score = self.score
 
-        # Máximo score de todos los usuarios registrados
+        # Maximum score of all registered users
         
         max_score = self.load_high_score()
       
@@ -1311,31 +1308,30 @@ class Game:
 
     def handle_set_difficulty(self, req: SetGameDifficulty) -> SetGameDifficultyResponse:
         """
-        Servicio 'difficulty':
-        - req.level: 'easy', 'medium' o 'hard'
-        - Solo permite cambiar si estamos en fase de menú (por ejemplo GameState.MENU)
+        Service 'difficulty':
+        - req.level: 'easy', 'medium' or 'hard'
+        - Only allows changing if we are in the menu phase 
         """
         level = req.change_difficulty.lower()
 
-        # Aquí puedes comprobar tu estado de juego; por ejemplo:
         if self.state != GameState.MENU:
-            rospy.loginfo("SERVICE difficulty: no estamos en fase 1, rechazado.")
+            rospy.loginfo("[GAME NODE] SERVICE difficulty: not in menu phase, rejected.")
             return SetGameDifficultyResponse(success=False)
 
         if level not in ("easy", "medium", "hard"):
-            rospy.logwarn("SERVICE difficulty: invalid level '%s'", level)
+            rospy.logwarn("[GAME NODE] SERVICE difficulty: invalid level '%s'", level)
             return SetGameDifficultyResponse(success=False)
 
         self.current_difficulty = level
         self.apply_difficulty_settings()
 
-        rospy.loginfo("SERVICE difficulty: difficulty changed to '%s'", level)
+        rospy.loginfo("[GAME NODE] SERVICE difficulty: difficulty changed to '%s'", level)
 
         return SetGameDifficultyResponse(success=True)
 
 
     def apply_difficulty_settings(self):
-        """Ajusta parámetros del juego según la dificultad actual."""
+        """Adjusts game parameters according to the current difficulty."""
         if self.current_difficulty == "easy":
             self.speed_multiplier = 0.5
         elif self.current_difficulty == "medium":
@@ -1343,11 +1339,11 @@ class Game:
         elif self.current_difficulty == "hard":
             self.speed_multiplier = 1.8
         else:
-            # Por si acaso llega algo raro
+            # Just in case something strange comes up
             self.speed_multiplier = 1.0
 
     def update_player_color_from_param(self):
-        """Lee el parámetro change_player_color y ajusta el color del jugador."""
+        """Reads the change_player_color parameter and adjusts the player's color."""
         code = rospy.get_param("change_player_color", 2)
 
         if code == 1:
@@ -1357,12 +1353,12 @@ class Game:
         else:
             self.player_color = PURPLE
 
-        # Si ya existe el jugador, actualizamos su color
+        # If the player already exists, update their color
         if hasattr(self, "player") and self.player is not None:
             self.player.color = self.player_color
 
     def update_screen_param(self):
-        """Actualiza el parámetro screen_param según el estado del juego."""
+        """Updates the screen_param parameter according to the game state."""
         if self.state == GameState.MENU:
             phase = "phase1"
         elif self.state == GameState.PLAYING:
@@ -1375,27 +1371,27 @@ class Game:
         rospy.set_param("screen_param", phase)
 
     def run(self):
-        """Bucle principal del nodo GAME_NODE organizado en 3 fases."""
+        """Main loop of the GAME_NODE organized in 3 phases."""
         running = True
 
         while running:
-            # ----- Fase 1: Welcome -----
+            # ----- Phase 1: Welcome -----
             running = self.welcome_phase()
             if not running:
-                break  # salir del juego
+                break  # exit the game
 
-            # ----- Fase 2: Game -----
+            # ----- Phase 2: Game -----
             running = self.game_phase()
             if not running:
                 break
 
-            # ----- Fase 3: Final -----
+            # ----- Phase 3: Final -----
             running = self.final_phase()
             if not running:
                 break
 
-            # Cuando salimos de la fase final, reseteamos el juego
-            # y volvemos a empezar desde la fase de Welcome
+            # When we exit the final phase, we reset the game
+            # and start again from the Welcome phase
             self.reset_game()
 
 def main():

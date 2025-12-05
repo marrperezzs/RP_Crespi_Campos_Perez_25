@@ -1337,11 +1337,11 @@ class Game:
     def apply_difficulty_settings(self):
         """Ajusta parámetros del juego según la dificultad actual."""
         if self.current_difficulty == "easy":
-            self.speed_multiplier = 0.8
+            self.speed_multiplier = 0.5
         elif self.current_difficulty == "medium":
             self.speed_multiplier = 1.0
         elif self.current_difficulty == "hard":
-            self.speed_multiplier = 1.2
+            self.speed_multiplier = 1.8
         else:
             # Por si acaso llega algo raro
             self.speed_multiplier = 1.0

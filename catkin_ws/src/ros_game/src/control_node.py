@@ -1,53 +1,78 @@
 #!/usr/bin/env python3
 import rospy
-import time
 from std_msgs.msg import String
+import pygame
 
+FPS = 60
 
 class ControlNode:
     def __init__(self):
-        # Create a publisher to publish user information
         self.pub = rospy.Publisher('/keyboard_control', String, queue_size=10)
-        rospy.loginfo("ControlNode initialized, ready to publish user info.")
-        #wait for the publisher to be ready
-        #time.sleep(5)
+        rospy.loginfo("ControlNode initialized (pygame), publishing to /keyboard_control")
 
-        #call the main function
-        self.main()
+        pygame.init()
+        # Ventana pequeña para que pygame reciba foco y capture teclas
+        self.screen = pygame.display.set_mode((320, 120))
+        pygame.display.set_caption("ROS Control Node (Arrow Keys)")
+        self.clock = pygame.time.Clock()
+
+        # Para evitar spamear el mismo comando cada frame
+        self.last_sent = None
+
+    def publish_cmd(self, cmd: str):
+        if cmd != self.last_sent:
+            self.pub.publish(String(cmd))
+            self.last_sent = cmd
+            rospy.loginfo("Published movement command: %s", cmd)
 
     def main(self):
-        #loops waiting for input of movements
-        while not rospy.is_shutdown():
-            command = input("Enter your movement command (w/a/s/d for up/left/down/right (not usefull) or space for jumping): ")
-            if command == 'w':
-                self.pub.publish('UP')
-                rospy.loginfo("Published movement command: %s", command)
-            elif command == 'a':
-                self.pub.publish('LEFT')
-                rospy.loginfo("Published movement command: %s", command)
-            elif command == 's':
-                self.pub.publish('DOWN')
-                rospy.loginfo("Published movement command: %s", command)
-            elif command ==    'd':
-                self.pub.publish('RIGHT')
-                rospy.loginfo("Published movement command: %s", command)
-            elif command == ' ':
-                self.pub.publish('JUMP')
-                rospy.loginfo("Published movement command: %s", command)
-            elif command == 'q':
-                rospy.loginfo("Quitting control node.")
-                break
-            
+        running = True
+        while running and not rospy.is_shutdown():
+            self.clock.tick(FPS)
+
+            # For our game only the up movements work but we defined all arrow keys to comply with the requirement
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    running = False
+
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_UP:
+                        self.publish_cmd("UP")
+                    elif event.key == pygame.K_DOWN:
+                        self.publish_cmd("DOWN")
+                    elif event.key == pygame.K_LEFT:
+                        self.publish_cmd("LEFT")
+                    elif event.key == pygame.K_RIGHT:
+                        self.publish_cmd("RIGHT")
+                    elif event.key == pygame.K_SPACE:
+                        self.publish_cmd("JUMP")
+                    elif event.key == pygame.K_q or event.key == pygame.K_ESCAPE:
+                        running = False
+
+            # Teclas mantenidas (movimiento continuo izq/der)
+            keys = pygame.key.get_pressed()
+            held = None
+            if keys[pygame.K_LEFT]:
+                held = "LEFT"
+            elif keys[pygame.K_RIGHT]:
+                held = "RIGHT"
+
+            if held:
+                self.publish_cmd(held)
             else:
-                rospy.loginfo("Invalid command. Please enter w/a/s/d or q to quit.")
-        
+                self.last_sent = None  # libera para permitir publicar otra vez al re-pulsar
+
+            # Dibujito mínimo (opcional)
+            self.screen.fill((20, 20, 20))
+            pygame.display.flip()
+
+        pygame.quit()
+        rospy.loginfo("ControlNode exiting.")
 
 if __name__ == '__main__':
     try:
-        # Initialize the ROS node
         rospy.init_node('control_node')
-        # Create an instance of ControlNode
-        control_node = ControlNode()
-
+        node = ControlNode()
+        node.main()
     except rospy.ROSInterruptException:
         pass

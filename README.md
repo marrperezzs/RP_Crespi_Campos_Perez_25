@@ -2,7 +2,6 @@
 # 1. Dependencies
 
 pygame
-ALGO MAS??
 
 # 2. How to run
 
@@ -20,7 +19,7 @@ After finishing the game the score will be shown in the screen but will also be 
 You can retry the game by pushing "R", you will have the same username as before. 
 
 You can change the speed of the game by changing the difficulty with the service implemented. Use another terminal for this.
-You can see the user name, the player color and phase using the parameter implemented using the terminal. Player color can also be changed. OTHER ALSO??
+You can see the user name, the player color and phase using the parameter implemented using the terminal. Player color can also be changed.
 
 
 # 4. Node-to-node communication
